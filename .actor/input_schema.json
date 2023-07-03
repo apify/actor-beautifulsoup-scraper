@@ -3,19 +3,50 @@
   "type": "object",
   "schemaVersion": 1,
   "properties": {
-    "start_urls": {
+    "startUrls": {
+      "sectionCaption": "Basic configuration",
       "title": "Start URLs",
       "type": "array",
-      "description": "URLs to start with",
+      "description": "A static list of URLs to scrape.",
       "prefill": [{ "url": "https://apify.com" }],
       "editor": "requestListSources"
     },
-    "max_depth": {
+    "maxDepth": {
       "title": "Maximum depth",
       "type": "integer",
-      "description": "Depth to which to scrape to",
+      "description": "Depth to which to scrape to.",
       "default": 1
+    },
+    "linkSelector": {
+      "title": "Link selector",
+      "type": "string",
+      "description": "A CSS selector stating which links on the page (<code>&lt;a&gt;</code> elements with <code>href</code> attribute) shall be followed and added to the request queue. To filter the links added to the queue, use the <b>linkPatterns</b> field.",
+      "editor": "textfield",
+      "prefill": "a[href]"
+    },
+    "linkPatterns": {
+      "title": "Link patterns",
+      "type": "array",
+      "description": "Link patterns (regular expressions) to match links in the page that you want to enqueue. Combine with Link selector to tell the scraper where to find links. Omitting the link patterns will cause the scraper to enqueue all links matched by the Link selector.",
+      "editor": "pseudoUrls",
+      "prefill": [".*"]
+    },
+    "pageFunction": {
+      "title": "Page function",
+      "type": "string",
+      "description": "A Python function that is executed for every page. Use it to scrape data from the page, perform actions or add new URLs to the request queue.",
+      "prefill": "async def page_function(context: Context) -> None:\n    soup = BeautifulSoup(context.response.content, \"html.parser\")\n    url = context.request[\"url\"]\n    title = soup.title.string if soup.title else None\n    await Actor.push_data({\"url\": url, \"title\": title})\n",
+      "editor": "python"
+    },
+    "proxyConfiguration": {
+      "sectionCaption": "Proxy and HTTP configuration",
+      "title": "Proxy configuration",
+      "type": "object",
+      "description": "Specifies proxy servers that will be used by the scraper in order to hide its origin.",
+      "prefill": { "useApifyProxy": true },
+      "default": { "useApifyProxy": true },
+      "editor": "proxy"
     }
   },
-  "required": ["start_urls"]
+  "required": ["startUrls", "pageFunction", "proxyConfiguration"]
 }
