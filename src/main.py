@@ -152,7 +152,11 @@ async def main():
 
         if not start_urls:
             Actor.log.info("No start URLs specified in actor input, exiting...")
-            await Actor.exit()
+            await Actor.exit(exit_code=1)
+
+        if not page_function:
+            Actor.log.error("No page function specified in actor input, exiting...")
+            await Actor.exit(exit_code=1)
 
         # Enqueue the starting URLs in the default request queue
         request_queue = await Actor.open_request_queue()
@@ -161,8 +165,8 @@ async def main():
             Actor.log.info(f"Enqueuing {url} ...")
             await request_queue.add_request(request={"url": url, "userData": {"depth": 0}})
 
-        proxies = await get_proxies_for_requests(proxy_configuration)
         user_defined_function = await extract_user_defined_function(page_function)
+        proxies = await get_proxies_for_requests(proxy_configuration)
 
         # Process the requests in the queue one by one
         while request := await request_queue.fetch_next_request():
@@ -178,8 +182,7 @@ async def main():
                         request_queue, request, response, max_depth, link_selector, link_patterns
                     )
 
-                if page_function:
-                    await execute_user_defined_function(context, user_defined_function)
+                await execute_user_defined_function(context, user_defined_function)
 
             finally:
                 # Mark the request as handled so it's not processed again
