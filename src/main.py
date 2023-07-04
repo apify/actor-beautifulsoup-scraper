@@ -1,6 +1,6 @@
 import re
 from inspect import iscoroutinefunction
-from typing import NamedTuple
+from typing import Callable, NamedTuple
 from urllib.parse import urljoin
 
 import requests
@@ -22,7 +22,6 @@ class Context(NamedTuple):
     request: dict
     response: requests.Response
     request_queue: RequestQueue
-    page_function: str
 
 
 async def get_proxies_for_requests(proxy_configuration: dict | None) -> dict | None:
@@ -85,20 +84,48 @@ async def update_request_queue(
         await request_queue.add_request(request={"url": link_url, "userData": {"depth": depth + 1}})
 
 
-async def execute_user_defined_function(context: Context) -> None:
+async def extract_user_defined_function(page_function: str) -> Callable:
     """
-    Extract and execute user-defined function.
-    """
-    exec(context.page_function)  # pylint: disable=exec-used
+    Extracts the user-defined function using exec and returns it as a Callable.
 
-    # Extraction
+    This function uses `exec` internally to execute the `page_function` code in a separate scope. The `page_function`
+    should be a valid Python code snippet defining a function named `USER_DEFINED_FUNCTION_NAME`.
+
+    Args:
+        page_function: The string representation of the user-defined function.
+
+    Returns:
+        The extracted user-defined function.
+
+    Raises:
+        KeyError: If the function name `USER_DEFINED_FUNCTION_NAME` cannot be found.
+    """
+    scope: dict = {"Context": Context}
+    exec(page_function, scope)  # pylint: disable=exec-used
+
     try:
-        user_defined_function = locals()[USER_DEFINED_FUNCTION_NAME]
+        user_defined_function = scope[USER_DEFINED_FUNCTION_NAME]
     except KeyError:
         Actor.log.error(f'Function name "{USER_DEFINED_FUNCTION_NAME}" could not be find, exiting...')
         await Actor.exit(exit_code=1)
 
-    # Execution
+    return user_defined_function
+
+
+async def execute_user_defined_function(context: Context, user_defined_function: Callable) -> None:
+    """
+    Executes the user-defined function with the provided context.
+
+    This function checks if the provided user-defined function is a coroutine. If it is, the function is awaited.
+    If it is not, it is executed directly.
+
+    Args:
+        context: The context object to be passed as an argument to the function.
+        user_defined_function: The user-defined function to be executed.
+
+    Returns:
+        None
+    """
     if iscoroutinefunction(user_defined_function):
         await user_defined_function(context)
     else:
@@ -135,6 +162,7 @@ async def main():
             await request_queue.add_request(request={"url": url, "userData": {"depth": 0}})
 
         proxies = await get_proxies_for_requests(proxy_configuration)
+        user_defined_function = await extract_user_defined_function(page_function)
 
         # Process the requests in the queue one by one
         while request := await request_queue.fetch_next_request():
@@ -143,7 +171,7 @@ async def main():
 
             try:
                 response = requests.get(url, proxies=proxies, timeout=DEFAULT_REQUESTS_TIMEOUT)
-                context = Context(request, response, request_queue, page_function)
+                context = Context(request, response, request_queue)
 
                 if link_selector:
                     await update_request_queue(
@@ -151,7 +179,7 @@ async def main():
                     )
 
                 if page_function:
-                    await execute_user_defined_function(context)
+                    await execute_user_defined_function(context, user_defined_function)
 
             finally:
                 # Mark the request as handled so it's not processed again
