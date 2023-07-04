@@ -22,9 +22,9 @@ class ActorInputData:
     start_urls: list[dict]
     link_selector: str | None
     link_patterns: list[str]
-    page_function: str | None
     max_depth: int
     proxy_configuration: Any
+    page_function: str | None
 
     @classmethod
     async def from_input(cls) -> "ActorInputData":
@@ -34,9 +34,9 @@ class ActorInputData:
             actor_input.get("startUrls", []),
             actor_input.get("linkSelector"),
             actor_input.get("linkPatterns", ".*"),  # default matches everything
-            actor_input.get("pageFunction"),
-            actor_input.get("maxDepth", float("inf")),  # default is unlimited
+            actor_input.get("maxCrawlingDepth", float("inf")),  # default is unlimited
             actor_input.get("proxyConfiguration"),
+            actor_input.get("pageFunction"),
         )
 
         Actor.log.debug(f"actor_input = {aid}")
@@ -82,7 +82,7 @@ async def get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None
             await Actor.exit(exit_code=1)
         else:
             proxy_url = await conf.new_url()
-            return {"http": proxy_url, "https": proxy_url}
+            return {"http://": proxy_url, "https://": proxy_url}
 
     return None
 

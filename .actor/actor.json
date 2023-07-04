@@ -3,7 +3,7 @@
   "name": "store-beautifulsoup-scraper",
   "title": "Getting started with Python and BeautifulSoup",
   "description": "Scrapes titles of websites using BeautifulSoup.",
-  "version": "0.0",
+  "version": "0.1",
   "meta": {
     "templateId": "python-beautifulsoup"
   },

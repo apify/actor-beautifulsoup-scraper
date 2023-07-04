@@ -1,6 +1,7 @@
 {
-  "title": "Python BeautifulSoup Scraper",
+  "title": "BeautifulSoup Scraper",
   "type": "object",
+  "description": "Todo: BeautifulSoup Scraper loads <b>Start URLs</b> using raw HTTP requests...",
   "schemaVersion": 1,
   "properties": {
     "startUrls": {
@@ -8,44 +9,45 @@
       "title": "Start URLs",
       "type": "array",
       "description": "A static list of URLs to scrape.",
-      "prefill": [{ "url": "https://apify.com" }],
-      "editor": "requestListSources"
+      "editor": "requestListSources",
+      "prefill": [{ "url": "https://crawlee.dev" }]
     },
-    "maxDepth": {
-      "title": "Maximum depth",
+    "maxCrawlingDepth": {
+      "title": "Max crawling depth",
       "type": "integer",
-      "description": "Depth to which to scrape to.",
+      "description": "Specifies how many links away from the <b>Start URLs</b> the scraper will descend. Note that pages added using <code>context.request_queue</code> in <b>Page function</b> are not subject to the maximum depth constraint.",
+      "minimum": 0,
+      "prefill": 1,
       "default": 1
     },
     "linkSelector": {
       "title": "Link selector",
       "type": "string",
-      "description": "A CSS selector stating which links on the page (<code>&lt;a&gt;</code> elements with <code>href</code> attribute) shall be followed and added to the request queue. To filter the links added to the queue, use the <b>linkPatterns</b> field.",
+      "description": "A CSS selector stating which links on the page (<code>&lt;a&gt;</code> elements with <code>href</code> attribute) shall be followed and added to the request queue. To filter the links added to the queue, use the <b>Link patterns</b> field.<br><br>If the <b>Link selector</b> is empty, the page links are ignored.",
       "editor": "textfield",
       "prefill": "a[href]"
     },
     "linkPatterns": {
       "title": "Link patterns",
       "type": "array",
-      "description": "Link patterns (regular expressions) to match links in the page that you want to enqueue. Combine with Link selector to tell the scraper where to find links. Omitting the link patterns will cause the scraper to enqueue all links matched by the Link selector.",
+      "description": "Link patterns (regular expressions) to match links in the page that you want to enqueue. Combine with <b>Link selector</b> to tell the scraper where to find links. Omitting the link patterns will cause the scraper to enqueue all links matched by the Link selector.",
       "editor": "pseudoUrls",
-      "prefill": [".*"]
-    },
-    "pageFunction": {
-      "title": "Page function",
-      "type": "string",
-      "description": "A Python function that is executed for every page. Use it to scrape data from the page, perform actions or add new URLs to the request queue.",
-      "prefill": "async def page_function(context: Context) -> None:\n    soup = BeautifulSoup(context.response.content, \"html.parser\")\n    url = context.request[\"url\"]\n    title = soup.title.string if soup.title else None\n    await Actor.push_data({\"url\": url, \"title\": title})\n",
-      "editor": "python"
+      "prefill": [".*crawlee\\.dev.*"]
     },
     "proxyConfiguration": {
       "sectionCaption": "Proxy and HTTP configuration",
       "title": "Proxy configuration",
       "type": "object",
       "description": "Specifies proxy servers that will be used by the scraper in order to hide its origin.",
-      "prefill": { "useApifyProxy": true },
-      "default": { "useApifyProxy": true },
-      "editor": "proxy"
+      "editor": "proxy",
+      "prefill": { "useApifyProxy": true }
+    },
+    "pageFunction": {
+      "title": "Page function",
+      "type": "string",
+      "description": "A Python function that is executed for every page. Use it to scrape data from the page, perform actions or add new URLs to the request queue.",
+      "editor": "python",
+      "prefill": "from apify import Actor\nfrom bs4 import BeautifulSoup\n\n\nasync def page_function(context: Context) -> None:\n    soup = BeautifulSoup(context.response.content, \"html.parser\")\n    url = context.request[\"url\"]\n    title = soup.title.string if soup.title else None\n    await Actor.push_data({\"url\": url, \"title\": title})\n"
     }
   },
   "required": ["startUrls", "pageFunction", "proxyConfiguration"]
