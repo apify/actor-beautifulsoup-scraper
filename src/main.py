@@ -4,7 +4,7 @@ from inspect import iscoroutinefunction
 from typing import Any, Callable
 from urllib.parse import urljoin
 
-import requests
+import httpx
 from apify import Actor
 from apify.storages import RequestQueue
 from bs4 import BeautifulSoup
@@ -59,11 +59,11 @@ class Context:
     """
 
     request: dict
-    response: requests.Response
+    response: httpx.Response
     request_queue: RequestQueue
 
 
-async def get_proxies_for_requests(proxy_configuration: dict | None) -> dict | None:
+async def get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None:
     """
     Retrieves the proxies dictionary based on the provided proxy configuration.
 
@@ -90,7 +90,7 @@ async def get_proxies_for_requests(proxy_configuration: dict | None) -> dict | N
 async def update_request_queue(
     request_queue: RequestQueue,
     request: dict,
-    response: requests.Response,
+    response: httpx.Response,
     max_depth: int,
     link_selector: str,
     link_patterns: list[str],
@@ -206,7 +206,7 @@ async def main():
             await request_queue.add_request(request={"url": url, "userData": {"depth": 0}})
 
         user_defined_function = await extract_user_defined_function(aid.page_function)
-        proxies = await get_proxies_for_requests(aid.proxy_configuration)
+        proxies = await get_proxies_from_conf(aid.proxy_configuration)
 
         # Process the requests in the queue one by one
         while request := await request_queue.fetch_next_request():
@@ -214,7 +214,9 @@ async def main():
             Actor.log.info(f"Scraping {url} ...")
 
             try:
-                response = requests.get(url, proxies=proxies, timeout=DEFAULT_REQUESTS_TIMEOUT)
+                async with httpx.AsyncClient(proxies=proxies) as client:
+                    response = await client.get(url, timeout=DEFAULT_REQUESTS_TIMEOUT)
+
                 context = Context(request, response, request_queue)
 
                 if aid.link_selector:
