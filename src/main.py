@@ -10,12 +10,12 @@ from bs4 import BeautifulSoup
 DEFAULT_MAX_DEPTH = float("inf")  # unlimited
 DEFAULT_LINK_PATTERNS = ".*"  # matches everything
 DEFAULT_REQUESTS_TIMEOUT = 10
-USER_DEFINED_FUNCTION = "page_function"
+USER_DEFINED_FUNCTION_NAME = "page_function"
 
 
 class Context(NamedTuple):
     """
-    Instance of this Context class is gonna be provided to the user-defined function.
+    Instance of the Context class is provided to the user-defined function.
     """
 
     request: dict
@@ -88,12 +88,13 @@ async def execute_page_function(context: Context) -> None:
     """
     Execute user-defined function.
     """
-    exec(context.page_function)
+    exec(context.page_function)  # pylint: disable=exec-used
     try:
-        await locals()[USER_DEFINED_FUNCTION](context)
+        user_defined_function = locals()[USER_DEFINED_FUNCTION_NAME]
     except KeyError:
-        Actor.log.error(f'Function name "{USER_DEFINED_FUNCTION}" could not be find, exiting...')
+        Actor.log.error(f'Function name "{USER_DEFINED_FUNCTION_NAME}" could not be find, exiting...')
         await Actor.exit(exit_code=1)
+    await user_defined_function(context)
 
 
 async def main():
