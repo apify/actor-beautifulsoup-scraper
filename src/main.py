@@ -1,6 +1,7 @@
 import re
+from dataclasses import dataclass
 from inspect import iscoroutinefunction
-from typing import Callable, NamedTuple
+from typing import Any, Callable
 from urllib.parse import urljoin
 
 import requests
@@ -8,15 +9,53 @@ from apify import Actor
 from apify.storages import RequestQueue
 from bs4 import BeautifulSoup
 
-DEFAULT_MAX_DEPTH = float("inf")  # unlimited
-DEFAULT_LINK_PATTERNS = ".*"  # matches everything
 DEFAULT_REQUESTS_TIMEOUT = 10
 USER_DEFINED_FUNCTION_NAME = "page_function"
 
 
-class Context(NamedTuple):
+@dataclass(frozen=True)
+class ActorInputData:
     """
-    Represents the execution context provided to the user-defined function.
+    Immutable data class representing the input data for the Actor.
+    """
+
+    start_urls: list[dict]
+    link_selector: str | None
+    link_patterns: list[str]
+    page_function: str | None
+    max_depth: int
+    proxy_configuration: Any
+
+    @classmethod
+    async def from_input(cls) -> "ActorInputData":
+        actor_input = await Actor.get_input() or {}
+
+        aid = cls(
+            actor_input.get("startUrls", []),
+            actor_input.get("linkSelector"),
+            actor_input.get("linkPatterns", ".*"),  # default matches everything
+            actor_input.get("pageFunction"),
+            actor_input.get("maxDepth", float("inf")),  # default is unlimited
+            actor_input.get("proxyConfiguration"),
+        )
+
+        Actor.log.debug(f"actor_input = {aid}")
+
+        if not aid.start_urls:
+            Actor.log.info("No start URLs specified in actor input, exiting...")
+            await Actor.exit(exit_code=1)
+
+        if not aid.page_function:
+            Actor.log.error("No page function specified in actor input, exiting...")
+            await Actor.exit(exit_code=1)
+
+        return aid
+
+
+@dataclass(frozen=True)
+class Context:
+    """
+    Immutable data class representing the context argument provided to the user-defined function.
     """
 
     request: dict
@@ -157,39 +196,17 @@ async def execute_user_defined_function(context: Context, user_defined_function:
 
 async def main():
     async with Actor:
-        # Read the Actor input
-        actor_input = await Actor.get_input() or {}
-        start_urls: list[dict] = actor_input.get("startUrls", [])
-        link_selector = actor_input.get("linkSelector")
-        link_patterns = actor_input.get("linkPatterns", DEFAULT_LINK_PATTERNS)
-        page_function = actor_input.get("pageFunction")
-        max_depth = actor_input.get("maxDepth", DEFAULT_MAX_DEPTH)
-        proxy_configuration = actor_input.get("proxyConfiguration")
-
-        Actor.log.debug(f"start_urls = {start_urls}")
-        Actor.log.debug(f"link_selector = {link_selector}")
-        Actor.log.debug(f"link_patterns = {link_patterns}")
-        Actor.log.debug(f"page_function = {page_function}")
-        Actor.log.debug(f"max_depth = {max_depth}")
-        Actor.log.debug(f"proxy_configuration = {proxy_configuration}")
-
-        if not start_urls:
-            Actor.log.info("No start URLs specified in actor input, exiting...")
-            await Actor.exit(exit_code=1)
-
-        if not page_function:
-            Actor.log.error("No page function specified in actor input, exiting...")
-            await Actor.exit(exit_code=1)
+        aid = await ActorInputData.from_input()
 
         # Enqueue the starting URLs in the default request queue
         request_queue = await Actor.open_request_queue()
-        for start_url in start_urls:
+        for start_url in aid.start_urls:
             url = start_url.get("url")
             Actor.log.info(f"Enqueuing {url} ...")
             await request_queue.add_request(request={"url": url, "userData": {"depth": 0}})
 
-        user_defined_function = await extract_user_defined_function(page_function)
-        proxies = await get_proxies_for_requests(proxy_configuration)
+        user_defined_function = await extract_user_defined_function(aid.page_function)
+        proxies = await get_proxies_for_requests(aid.proxy_configuration)
 
         # Process the requests in the queue one by one
         while request := await request_queue.fetch_next_request():
@@ -200,9 +217,9 @@ async def main():
                 response = requests.get(url, proxies=proxies, timeout=DEFAULT_REQUESTS_TIMEOUT)
                 context = Context(request, response, request_queue)
 
-                if link_selector:
+                if aid.link_selector:
                     await update_request_queue(
-                        request_queue, request, response, max_depth, link_selector, link_patterns
+                        request_queue, request, response, aid.max_depth, aid.link_selector, aid.link_patterns
                     )
 
                 await execute_user_defined_function(context, user_defined_function)
