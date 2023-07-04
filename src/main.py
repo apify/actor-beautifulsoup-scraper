@@ -1,4 +1,5 @@
 import re
+from inspect import iscoroutinefunction
 from typing import NamedTuple
 from urllib.parse import urljoin
 
@@ -84,17 +85,24 @@ async def update_request_queue(
         await request_queue.add_request(request={"url": link_url, "userData": {"depth": depth + 1}})
 
 
-async def execute_page_function(context: Context) -> None:
+async def execute_user_defined_function(context: Context) -> None:
     """
-    Execute user-defined function.
+    Extract and execute user-defined function.
     """
     exec(context.page_function)  # pylint: disable=exec-used
+
+    # Extraction
     try:
         user_defined_function = locals()[USER_DEFINED_FUNCTION_NAME]
     except KeyError:
         Actor.log.error(f'Function name "{USER_DEFINED_FUNCTION_NAME}" could not be find, exiting...')
         await Actor.exit(exit_code=1)
-    await user_defined_function(context)
+
+    # Execution
+    if iscoroutinefunction(user_defined_function):
+        await user_defined_function(context)
+    else:
+        user_defined_function(context)
 
 
 async def main():
@@ -143,7 +151,7 @@ async def main():
                     )
 
                 if page_function:
-                    await execute_page_function(context)
+                    await execute_user_defined_function(context)
 
             finally:
                 # Mark the request as handled so it's not processed again
