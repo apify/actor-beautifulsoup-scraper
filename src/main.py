@@ -207,6 +207,9 @@ async def main():
 
                 await execute_user_defined_function(context, user_defined_function)
 
+            except:  # pylint: disable=bare-except
+                Actor.log.exception(f"Cannot extract data from {url}.")
+
             finally:
                 # Mark the request as handled so it's not processed again
                 await request_queue.mark_request_as_handled(request)
