@@ -16,7 +16,7 @@ USER_DEFINED_FUNCTION_NAME = "page_function"
 
 class Context(NamedTuple):
     """
-    Instance of the Context class is provided to the user-defined function.
+    Represents the execution context provided to the user-defined function.
     """
 
     request: dict
@@ -26,7 +26,14 @@ class Context(NamedTuple):
 
 async def get_proxies_for_requests(proxy_configuration: dict | None) -> dict | None:
     """
-    Get proxies dictionary based on the proxy configuration.
+    Retrieves the proxies dictionary based on the provided proxy configuration.
+
+    Args:
+        proxy_configuration: The proxy configuration dictionary. If None, no proxies will be used.
+
+    Returns:
+        The proxies dictionary containing "http" and "https" keys with the proxy URL.
+        Returns None if proxy_configuration is None.
     """
     if proxy_configuration:
         conf = await Actor.create_proxy_configuration(actor_proxy_input=proxy_configuration)
@@ -50,7 +57,23 @@ async def update_request_queue(
     link_patterns: list[str],
 ) -> None:
     """
-    Update the request queue with the new links found in the response.
+    Updates the request queue with new links found in the response.
+
+    This function parses the HTML content of the response using BeautifulSoup and extracts links based
+    on the provided CSS selector. It then checks each link against the specified regex patterns to determine
+    if it should be enqueued in the request queue. The depth of the links is compared to the maximum depth
+    to avoid exceeding it. Valid links are enqueued with an increased depth in the request queue.
+
+    Args:
+        request_queue: The request queue to update.
+        request: The original request.
+        response: The response object containing the HTML content.
+        max_depth: The maximum depth allowed for enqueueing links.
+        link_selector: The CSS selector to locate the links in the HTML content.
+        link_patterns: The list of regex patterns to match the links against.
+
+    Returns:
+        None
     """
     soup = BeautifulSoup(response.content, "html.parser")
     url = request["url"]
