@@ -1,7 +1,7 @@
 {
   "title": "BeautifulSoup Scraper",
   "type": "object",
-  "description": "Todo: BeautifulSoup Scraper loads <b>Start URLs</b> using raw HTTP requests...",
+  "description": "Beautifulsoup Scraper loads <b>Start URLs</b> using HTTP requests and then executes <b>Page function</b> for each page to extract data from it. To follow links and scrape additional pages, set <b>Link selector</b> with <b>Link patterns</b> to specify which links to follow. Alternatively, you can manually enqueue new links in the <b>Page function</b>. For details, see the actor's <a href='https://apify.com/apify/store-beautifulsoup-scraper' target='_blank' rel='noopener'>README</a>.",
   "schemaVersion": 1,
   "properties": {
     "startUrls": {
@@ -23,7 +23,7 @@
     "linkSelector": {
       "title": "Link selector",
       "type": "string",
-      "description": "A CSS selector stating which links on the page (<code>&lt;a&gt;</code> elements with <code>href</code> attribute) shall be followed and added to the request queue. To filter the links added to the queue, use the <b>Link patterns</b> field.<br><br>If the <b>Link selector</b> is empty, the page links are ignored.",
+      "description": "A CSS selector stating which links on the page (<code>&lt;a&gt;</code> elements with <code>href</code> attribute) shall be followed and added to the request queue. To filter the links added to the queue, use the <b>Link patterns</b> field.<br><br>If the <b>Link selector</b> is empty, the page links are ignored. Of course, you can work with the page links and the request queue in the <b>Page function</b> as well.",
       "editor": "textfield",
       "prefill": "a[href]"
     },
@@ -34,6 +34,13 @@
       "editor": "stringList",
       "prefill": [".*crawlee\\.dev.*"]
     },
+    "pageFunction": {
+      "title": "Page function",
+      "type": "string",
+      "description": "A Python function, that is executed for every page. Use it to scrape data from the page, perform actions or add new URLs to the request queue. The page function has its own naming scope and you can import any installed modules. Typically you would want to create a BeautifulSoup object, find the data you want to obtain, and push it to the Actor. Identifier <code>page_function</code> can't be changed. The definition of the <code>context</code> object you get into the <code>page_function</code> is defined here <a href='https://github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py' target='_blank' rel='noopener'>github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py</a>.",
+      "editor": "python",
+      "prefill": "from apify import Actor\nfrom bs4 import BeautifulSoup\n\n\nasync def page_function(context: Context) -> None:\n    soup = BeautifulSoup(context.response.content, \"html.parser\")\n    url = context.request[\"url\"]\n    title = soup.title.string if soup.title else None\n    await Actor.push_data({\"url\": url, \"title\": title})\n"
+    },
     "proxyConfiguration": {
       "sectionCaption": "Proxy and HTTP configuration",
       "title": "Proxy configuration",
@@ -42,13 +49,6 @@
       "editor": "proxy",
       "prefill": { "useApifyProxy": true },
       "default": { "useApifyProxy": true }
-    },
-    "pageFunction": {
-      "title": "Page function",
-      "type": "string",
-      "description": "A Python function that is executed for every page. Use it to scrape data from the page, perform actions or add new URLs to the request queue.",
-      "editor": "python",
-      "prefill": "from apify import Actor\nfrom bs4 import BeautifulSoup\n\n\nasync def page_function(context: Context) -> None:\n    soup = BeautifulSoup(context.response.content, \"html.parser\")\n    url = context.request[\"url\"]\n    title = soup.title.string if soup.title else None\n    await Actor.push_data({\"url\": url, \"title\": title})\n"
     }
   },
   "required": ["startUrls", "pageFunction", "proxyConfiguration"]
