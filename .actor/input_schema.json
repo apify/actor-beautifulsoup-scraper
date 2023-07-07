@@ -31,7 +31,7 @@
       "title": "Link patterns",
       "type": "array",
       "description": "Link patterns (regular expressions) to match links in the page that you want to enqueue. Combine with <b>Link selector</b> to tell the scraper where to find links. Omitting the link patterns will cause the scraper to enqueue all links matched by the Link selector.",
-      "editor": "pseudoUrls",
+      "editor": "stringList",
       "prefill": [".*crawlee\\.dev.*"]
     },
     "proxyConfiguration": {
@@ -40,7 +40,8 @@
       "type": "object",
       "description": "Specifies proxy servers that will be used by the scraper in order to hide its origin.",
       "editor": "proxy",
-      "prefill": { "useApifyProxy": true }
+      "prefill": { "useApifyProxy": true },
+      "default": { "useApifyProxy": true }
     },
     "pageFunction": {
       "title": "Page function",
