@@ -3,14 +3,13 @@ from inspect import iscoroutinefunction
 from typing import Callable
 from urllib.parse import urljoin
 
-import httpx
 from apify import Actor
 from apify.storages import RequestQueue
 from bs4 import BeautifulSoup
+from httpx import AsyncClient, Response
 
 from .dataclasses import ActorInputData, Context
 
-DEFAULT_REQUESTS_TIMEOUT = 10
 USER_DEFINED_FUNCTION_NAME = "page_function"
 
 
@@ -41,7 +40,7 @@ async def _get_proxies_from_conf(proxy_configuration: dict | None) -> dict | Non
 async def _update_request_queue(
     request_queue: RequestQueue,
     request: dict,
-    response: httpx.Response,
+    response: Response,
     max_depth: int,
     link_selector: str,
     link_patterns: list[str],
@@ -165,8 +164,8 @@ async def main():
             Actor.log.info(f"Scraping {url} ...")
 
             try:
-                async with httpx.AsyncClient(proxies=proxies) as client:
-                    response = await client.get(url, timeout=DEFAULT_REQUESTS_TIMEOUT)
+                async with AsyncClient(proxies=proxies) as client:
+                    response = await client.get(url, timeout=aid.request_timeout)
 
                 context = Context(request, response, request_queue)
 

@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Any
 
-import httpx
 from apify import Actor
 from apify.storages import RequestQueue
+from httpx import Response
 
 
 @dataclass(frozen=True)
@@ -16,6 +16,7 @@ class ActorInputData:
     link_selector: str | None
     link_patterns: list[str]
     max_depth: int
+    request_timeout: int
     proxy_configuration: Any
     page_function: str | None
 
@@ -27,7 +28,8 @@ class ActorInputData:
             actor_input.get("startUrls", []),
             actor_input.get("linkSelector"),
             actor_input.get("linkPatterns", [".*"]),  # default matches everything
-            actor_input.get("maxCrawlingDepth", float("inf")),  # default is unlimited
+            actor_input.get("maxCrawlingDepth", 1),  # default is 1
+            actor_input.get("requestTimeout", 10), # default is 10
             actor_input.get("proxyConfiguration"),
             actor_input.get("pageFunction"),
         )
@@ -52,5 +54,5 @@ class Context:
     """
 
     request: dict
-    response: httpx.Response
+    response: Response
     request_queue: RequestQueue
