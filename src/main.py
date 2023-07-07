@@ -1,7 +1,6 @@
 import re
-from dataclasses import dataclass
 from inspect import iscoroutinefunction
-from typing import Any, Callable
+from typing import Callable
 from urllib.parse import urljoin
 
 import httpx
@@ -9,61 +8,13 @@ from apify import Actor
 from apify.storages import RequestQueue
 from bs4 import BeautifulSoup
 
+from .dataclasses import ActorInputData, Context
+
 DEFAULT_REQUESTS_TIMEOUT = 10
 USER_DEFINED_FUNCTION_NAME = "page_function"
 
 
-@dataclass(frozen=True)
-class ActorInputData:
-    """
-    Immutable data class representing the input data for the Actor.
-    """
-
-    start_urls: list[dict]
-    link_selector: str | None
-    link_patterns: list[str]
-    max_depth: int
-    proxy_configuration: Any
-    page_function: str | None
-
-    @classmethod
-    async def from_input(cls) -> "ActorInputData":
-        actor_input = await Actor.get_input() or {}
-
-        aid = cls(
-            actor_input.get("startUrls", []),
-            actor_input.get("linkSelector"),
-            actor_input.get("linkPatterns", ".*"),  # default matches everything
-            actor_input.get("maxCrawlingDepth", float("inf")),  # default is unlimited
-            actor_input.get("proxyConfiguration"),
-            actor_input.get("pageFunction"),
-        )
-
-        Actor.log.debug(f"actor_input = {aid}")
-
-        if not aid.start_urls:
-            Actor.log.info("No start URLs specified in actor input, exiting...")
-            await Actor.exit(exit_code=1)
-
-        if not aid.page_function:
-            Actor.log.error("No page function specified in actor input, exiting...")
-            await Actor.exit(exit_code=1)
-
-        return aid
-
-
-@dataclass(frozen=True)
-class Context:
-    """
-    Immutable data class representing the context argument provided to the user-defined function.
-    """
-
-    request: dict
-    response: httpx.Response
-    request_queue: RequestQueue
-
-
-async def get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None:
+async def _get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None:
     """
     Retrieves the proxies dictionary based on the provided proxy configuration.
 
@@ -87,7 +38,7 @@ async def get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None
     return None
 
 
-async def update_request_queue(
+async def _update_request_queue(
     request_queue: RequestQueue,
     request: dict,
     response: httpx.Response,
@@ -135,18 +86,18 @@ async def update_request_queue(
                 break
 
         if not matched:
-            Actor.log.debug(f"Link URL ({link_url}) does not match any pattern")
+            Actor.log.debug(f"Link URL {link_url} does not match any pattern")
             continue
 
         if not link_url.startswith(("http://", "https://")):
-            Actor.log.debug(f"Link URL ({link_url}) does not start with http/https")
+            Actor.log.debug(f"Link URL {link_url} does not start with http/https")
             continue
 
         Actor.log.info(f"Enqueuing {link_url} ...")
         await request_queue.add_request(request={"url": link_url, "userData": {"depth": depth + 1}})
 
 
-async def extract_user_defined_function(page_function: str) -> Callable:
+async def _extract_user_defined_function(page_function: str) -> Callable:
     """
     Extracts the user-defined function using exec and returns it as a Callable.
 
@@ -174,7 +125,7 @@ async def extract_user_defined_function(page_function: str) -> Callable:
     return user_defined_function
 
 
-async def execute_user_defined_function(context: Context, user_defined_function: Callable) -> None:
+async def _execute_user_defined_function(context: Context, user_defined_function: Callable) -> None:
     """
     Executes the user-defined function with the provided context.
 
@@ -205,8 +156,8 @@ async def main():
             Actor.log.info(f"Enqueuing {url} ...")
             await request_queue.add_request(request={"url": url, "userData": {"depth": 0}})
 
-        user_defined_function = await extract_user_defined_function(aid.page_function)
-        proxies = await get_proxies_from_conf(aid.proxy_configuration)
+        user_defined_function = await _extract_user_defined_function(aid.page_function)
+        proxies = await _get_proxies_from_conf(aid.proxy_configuration)
 
         # Process the requests in the queue one by one
         while request := await request_queue.fetch_next_request():
@@ -220,11 +171,11 @@ async def main():
                 context = Context(request, response, request_queue)
 
                 if aid.link_selector:
-                    await update_request_queue(
+                    await _update_request_queue(
                         request_queue, request, response, aid.max_depth, aid.link_selector, aid.link_patterns
                     )
 
-                await execute_user_defined_function(context, user_defined_function)
+                await _execute_user_defined_function(context, user_defined_function)
 
             except:  # pylint: disable=bare-except
                 Actor.log.exception(f"Cannot extract data from {url}.")
