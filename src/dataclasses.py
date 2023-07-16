@@ -37,7 +37,7 @@ class ActorInputData:
         Actor.log.debug(f"actor_input = {aid}")
 
         if not aid.start_urls:
-            Actor.log.info("No start URLs specified in actor input, exiting...")
+            Actor.log.error("No start URLs specified in actor input, exiting...")
             await Actor.exit(exit_code=1)
 
         if not aid.page_function:

@@ -118,7 +118,7 @@ async def _extract_user_defined_function(page_function: str) -> Callable:
     try:
         user_defined_function = scope[USER_DEFINED_FUNCTION_NAME]
     except KeyError:
-        Actor.log.error(f'Function name "{USER_DEFINED_FUNCTION_NAME}" could not be find, exiting...')
+        Actor.log.error(f'Function name "{USER_DEFINED_FUNCTION_NAME}" could not be found, exiting...')
         await Actor.exit(exit_code=1)
 
     return user_defined_function
