@@ -47,15 +47,15 @@ The definition of the `context` object you get into the `page_function`
 Example:
 
 ```python
-from apify import Actor
+from typing import Any
 from bs4 import BeautifulSoup
 
 
-async def page_function(context: Context) -> None:
+async def page_function(context: Context) -> Any:
     soup = BeautifulSoup(context.response.content, "html.parser")
     url = context.request["url"]
     title = soup.title.string if soup.title else None
-    await Actor.push_data({"url": url, "title": title})
+    return {"url": url, "title": title}
 ```
 
 The code runs in Python 11 and the function accepts a single argument, the `context` object, which is defined in the [github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py](https://github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py) module.

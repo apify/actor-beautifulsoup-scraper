@@ -126,7 +126,7 @@ async def _extract_user_defined_function(page_function: str) -> Callable:
 
 async def _execute_user_defined_function(context: Context, user_defined_function: Callable) -> None:
     """
-    Executes the user-defined function with the provided context.
+    Executes the user-defined function with the provided context and pushes data to the Actor.
 
     This function checks if the provided user-defined function is a coroutine. If it is, the function is awaited.
     If it is not, it is executed directly.
@@ -139,9 +139,11 @@ async def _execute_user_defined_function(context: Context, user_defined_function
         None
     """
     if iscoroutinefunction(user_defined_function):
-        await user_defined_function(context)
+        result = await user_defined_function(context)
     else:
-        user_defined_function(context)
+        result = user_defined_function(context)
+
+    await Actor.push_data(result)
 
 
 async def main():
