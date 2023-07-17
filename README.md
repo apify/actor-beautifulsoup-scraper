@@ -51,7 +51,7 @@ from typing import Any
 from bs4 import BeautifulSoup
 
 
-async def page_function(context: Context) -> Any:
+def page_function(context: Context) -> Any:
     soup = BeautifulSoup(context.response.content, "html.parser")
     url = context.request["url"]
     title = soup.title.string if soup.title else None

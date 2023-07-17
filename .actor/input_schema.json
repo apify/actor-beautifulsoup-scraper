@@ -45,9 +45,9 @@
     "pageFunction": {
       "title": "Page function",
       "type": "string",
-      "description": "A Python function, that is executed for every page. Use it to scrape data from the page, perform actions or add new URLs to the request queue. The page function has its own naming scope and you can import any installed modules. Typically you would want to create a BeautifulSoup object, find the data you want to obtain and return them. Identifier <code>page_function</code> can't be changed. The definition of the <code>context</code> object you get into the <code>page_function</code> is defined here <a href='https://github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py' target='_blank' rel='noopener'>github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py</a>.",
+      "description": "A Python function, that is executed for every page. Use it to scrape data from the page, perform actions or add new URLs to the request queue. The page function has its own naming scope and you can import any installed modules. Typically you would want to create a BeautifulSoup object, find the data you want to obtain and return them. Identifier <code>page_function</code> can't be changed. The definition of the <code>context</code> object you get into the <code>page_function</code> is defined here <a href='https://github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py' target='_blank' rel='noopener'>github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py</a>. Asynchronous functions are supported.",
       "editor": "python",
-      "prefill": "from typing import Any\nfrom bs4 import BeautifulSoup\n\n\nasync def page_function(context: Context) -> Any:\n    soup = BeautifulSoup(context.response.content, \"html.parser\")\n    url = context.request[\"url\"]\n    title = soup.title.string if soup.title else None\n    return {\"url\": url, \"title\": title}\n"
+      "prefill": "from typing import Any\nfrom bs4 import BeautifulSoup\n\n\ndef page_function(context: Context) -> Any:\n    soup = BeautifulSoup(context.response.content, \"html.parser\")\n    url = context.request[\"url\"]\n    title = soup.title.string if soup.title else None\n    return {\"url\": url, \"title\": title}\n"
     },
     "proxyConfiguration": {
       "sectionCaption": "Proxy and HTTP configuration",
