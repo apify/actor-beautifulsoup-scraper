@@ -29,7 +29,7 @@ class ActorInputData:
             actor_input.get("linkSelector"),
             actor_input.get("linkPatterns", [".*"]),  # default matches everything
             actor_input.get("maxCrawlingDepth", 1),  # default is 1
-            actor_input.get("requestTimeout", 10), # default is 10
+            actor_input.get("requestTimeout", 10),  # default is 10
             actor_input.get("proxyConfiguration"),
             actor_input.get("pageFunction"),
         )
