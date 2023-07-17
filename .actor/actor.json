@@ -2,8 +2,8 @@
   "actorSpecification": 1,
   "name": "store-beautifulsoup-scraper",
   "title": "Getting started with Python and BeautifulSoup",
-  "description": "Scrapes titles of websites using BeautifulSoup.",
-  "version": "0.0",
+  "description": "Crawls websites using raw HTTP requests, parses the HTML with the BeautifulSoup library, and extracts data from the pages using Python code. Supports both recursive crawling and lists of URLs. This actor is a Python alternative to apify/cheerio-scraper.",
+  "version": "0.1",
   "meta": {
     "templateId": "python-beautifulsoup"
   },

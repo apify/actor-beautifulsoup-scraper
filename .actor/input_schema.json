@@ -1,21 +1,63 @@
 {
-  "title": "Python BeautifulSoup Scraper",
+  "title": "BeautifulSoup Scraper",
   "type": "object",
+  "description": "Beautifulsoup Scraper loads <b>Start URLs</b> using HTTP requests and then executes <b>Page function</b> for each page to extract data from it. To follow links and scrape additional pages, set <b>Link selector</b> with <b>Link patterns</b> to specify which links to follow. Alternatively, you can manually enqueue new links in the <b>Page function</b>. For details, see the actor's <a href='https://apify.com/apify/store-beautifulsoup-scraper' target='_blank' rel='noopener'>README</a>.",
   "schemaVersion": 1,
   "properties": {
-    "start_urls": {
+    "startUrls": {
+      "sectionCaption": "Basic configuration",
       "title": "Start URLs",
       "type": "array",
-      "description": "URLs to start with",
-      "prefill": [{ "url": "https://apify.com" }],
-      "editor": "requestListSources"
+      "description": "A static list of URLs to scrape.",
+      "editor": "requestListSources",
+      "prefill": [{ "url": "https://crawlee.dev" }]
     },
-    "max_depth": {
-      "title": "Maximum depth",
+    "maxCrawlingDepth": {
+      "title": "Max crawling depth",
       "type": "integer",
-      "description": "Depth to which to scrape to",
+      "description": "Specifies how many links away from the <b>Start URLs</b> the scraper will descend. Note that pages added using <code>context.request_queue</code> in <b>Page function</b> are not subject to the maximum depth constraint.",
+      "minimum": 0,
+      "prefill": 1,
       "default": 1
+    },
+    "requestTimeout": {
+      "title": "Request timeout",
+      "type": "integer",
+      "description": "The maximum duration (in seconds) for the request to complete before timing out. The timeout value is passed to the <code>httpx.AsyncClient</code> object.",
+      "minimum": 0,
+      "prefill": 10,
+      "default": 10
+    },
+    "linkSelector": {
+      "title": "Link selector",
+      "type": "string",
+      "description": "A CSS selector stating which links on the page (<code>&lt;a&gt;</code> elements with <code>href</code> attribute) shall be followed and added to the request queue. To filter the links added to the queue, use the <b>Link patterns</b> field.<br><br>If the <b>Link selector</b> is empty, the page links are ignored. Of course, you can work with the page links and the request queue in the <b>Page function</b> as well.",
+      "editor": "textfield",
+      "prefill": "a[href]"
+    },
+    "linkPatterns": {
+      "title": "Link patterns",
+      "type": "array",
+      "description": "Link patterns (regular expressions) to match links in the page that you want to enqueue. Combine with <b>Link selector</b> to tell the scraper where to find links. Omitting the link patterns will cause the scraper to enqueue all links matched by the Link selector.",
+      "editor": "stringList",
+      "prefill": [".*crawlee\\.dev.*"]
+    },
+    "pageFunction": {
+      "title": "Page function",
+      "type": "string",
+      "description": "A Python function, that is executed for every page. Use it to scrape data from the page, perform actions or add new URLs to the request queue. The page function has its own naming scope and you can import any installed modules. Typically you would want to create a BeautifulSoup object, find the data you want to obtain and return them. Identifier <code>page_function</code> can't be changed. The definition of the <code>context</code> object you get into the <code>page_function</code> is defined here <a href='https://github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py' target='_blank' rel='noopener'>github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py</a>. Asynchronous functions are supported.",
+      "editor": "python",
+      "prefill": "from typing import Any\nfrom bs4 import BeautifulSoup\n\n\ndef page_function(context: Context) -> Any:\n    soup = BeautifulSoup(context.response.content, \"html.parser\")\n    url = context.request[\"url\"]\n    title = soup.title.string if soup.title else None\n    return {\"url\": url, \"title\": title}\n"
+    },
+    "proxyConfiguration": {
+      "sectionCaption": "Proxy and HTTP configuration",
+      "title": "Proxy configuration",
+      "type": "object",
+      "description": "Specifies proxy servers that will be used by the scraper in order to hide its origin.",
+      "editor": "proxy",
+      "prefill": { "useApifyProxy": true },
+      "default": { "useApifyProxy": true }
     }
   },
-  "required": ["start_urls"]
+  "required": ["startUrls", "pageFunction", "proxyConfiguration"]
 }
