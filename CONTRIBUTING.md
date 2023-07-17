@@ -48,11 +48,26 @@ pip install -r requirements-dev.txt
 
 ## Local execution
 
+Prepare a `storage/key_value_stores/default/INPUT.json` file, here is an example:
+
+```json
+{
+  "startUrls": [{ "url": "https://crawlee.dev/" }],
+  "maxCrawlingDepth": 1,
+  "linkSelector": "a[href]",
+  "linkPatterns": [".*crawlee\\.dev.*"],
+  "proxyConfiguration": { "useApifyProxy": true },
+  "pageFunction": "from typing import Any\nfrom bs4 import BeautifulSoup\n\n\ndef page_function(context: Context) -> Any:\n    soup = BeautifulSoup(context.response.content, \"html.parser\")\n    url = context.request[\"url\"]\n    title = soup.title.string if soup.title else None\n    return {\"url\": url, \"title\": title}\n"
+}
+```
+
 Run the Actor using [Apify CLI](https://docs.apify.com/cli/):
 
 ```bash
 apify run --purge
 ```
+
+<!-- Todo: In Apify CLI v3 is --purge option by default -->
 
 ## Formatting
 
