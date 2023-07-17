@@ -64,7 +64,8 @@ async def _update_request_queue(
     Returns:
         None
     """
-    soup = BeautifulSoup(response.content, "html.parser")
+    # Todo: provide a user option for the features param
+    soup = BeautifulSoup(response.content, features="html.parser")
     url = request["url"]
     depth = request["userData"]["depth"]
 
@@ -166,6 +167,7 @@ async def main():
             Actor.log.info(f"Scraping {url} ...")
 
             try:
+                # Todo: think about using the same client for the whole request queue
                 async with AsyncClient(proxies=proxies) as client:
                     response = await client.get(url, timeout=aid.request_timeout)
 
