@@ -49,6 +49,13 @@
       "editor": "python",
       "prefill": "from typing import Any\nfrom bs4 import BeautifulSoup\n\n\ndef page_function(context: Context) -> Any:\n    soup = BeautifulSoup(context.response.content, \"html.parser\")\n    url = context.request[\"url\"]\n    title = soup.title.string if soup.title else None\n    return {\"url\": url, \"title\": title}\n"
     },
+    "beautifulsoupFeatures": {
+      "title": "BeautifulSoup features argument",
+      "type": "string",
+      "description": "The value of BeautifulSoup features argument for the <a href='https://github.com/apify/actor-beautifulsoup-scraper/blob/master/src/utils.py' target='_blank' rel='noopener'>update_request_queue</a> function. From BeautifulSoup docs: Desirable features of the parser to be used. This may be the name of a specific parser (\"lxml\", \"lxml-xml\", \"html.parser\", or \"html5lib\") or it may be the type of markup to be used (\"html\", \"html5\", \"xml\"). It's recommended that you name a specific parser, so that Beautiful Soup gives you the same results across platforms and virtual environments.",
+      "editor": "textfield",
+      "prefill": "html.parser"
+    },
     "proxyConfiguration": {
       "sectionCaption": "Proxy and HTTP configuration",
       "title": "Proxy configuration",

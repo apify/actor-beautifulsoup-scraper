@@ -34,7 +34,13 @@ async def main():
 
                 if aid.link_selector:
                     await update_request_queue(
-                        request_queue, request, response, aid.max_depth, aid.link_selector, aid.link_patterns
+                        request_queue,
+                        request,
+                        response,
+                        aid.max_depth,
+                        aid.link_selector,
+                        aid.link_patterns,
+                        aid.beautifulsoup_features,
                     )
 
                 await execute_user_function(context, user_defined_function)

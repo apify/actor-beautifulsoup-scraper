@@ -44,6 +44,7 @@ async def update_request_queue(
     max_depth: int,
     link_selector: str,
     link_patterns: list[str],
+    beautifulsoup_features: str,
 ) -> None:
     """
     Updates the request queue with new links found in the response.
@@ -64,8 +65,7 @@ async def update_request_queue(
     Returns:
         None
     """
-    # Todo: provide a user option for the features param
-    soup = BeautifulSoup(response.content, features="html.parser")
+    soup = BeautifulSoup(response.content, features=beautifulsoup_features)
     url = request["url"]
     depth = request["userData"]["depth"]
 

@@ -19,6 +19,7 @@ class ActorInputData:
     request_timeout: int
     proxy_configuration: Any
     page_function: str | None
+    beautifulsoup_features: str
 
     @classmethod
     async def from_input(cls) -> "ActorInputData":
@@ -32,6 +33,7 @@ class ActorInputData:
             actor_input.get("requestTimeout", 10),  # default is 10
             actor_input.get("proxyConfiguration"),
             actor_input.get("pageFunction"),
+            actor_input.get("beautifulsoupFeatures", "html.parser"),  # default is "html.parser"
         )
 
         Actor.log.debug(f"actor_input = {aid}")
