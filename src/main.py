@@ -1,4 +1,5 @@
 from apify import Actor
+from bs4 import BeautifulSoup
 from httpx import AsyncClient
 
 from .dataclasses import ActorInputData, Context
@@ -30,19 +31,24 @@ async def main():
                 async with AsyncClient(proxies=proxies) as client:
                     response = await client.get(url, timeout=aid.request_timeout)
 
-                context = Context(request, response, request_queue)
+                soup = BeautifulSoup(
+                    response.content,
+                    features=aid.soup_features,
+                    from_encoding=aid.soup_from_encoding,
+                    exclude_encodings=aid.soup_exclude_encodings,
+                )
 
                 if aid.link_selector:
                     await update_request_queue(
+                        soup,
                         request_queue,
                         request,
-                        response,
                         aid.max_depth,
                         aid.link_selector,
                         aid.link_patterns,
-                        aid.beautifulsoup_features,
                     )
 
+                context = Context(soup, request, request_queue, response)
                 await execute_user_function(context, user_defined_function)
 
             except:  # pylint: disable=bare-except

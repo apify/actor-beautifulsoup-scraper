@@ -48,13 +48,10 @@ Example:
 
 ```python
 from typing import Any
-from bs4 import BeautifulSoup
-
 
 def page_function(context: Context) -> Any:
-    soup = BeautifulSoup(context.response.content, "html.parser")
     url = context.request["url"]
-    title = soup.title.string if soup.title else None
+    title = context.soup.title.string if context.soup.title else None
     return {"url": url, "title": title}
 ```
 

@@ -6,7 +6,6 @@ from urllib.parse import urljoin
 from apify import Actor
 from apify.storages import RequestQueue
 from bs4 import BeautifulSoup
-from httpx import Response
 
 from .dataclasses import Context
 
@@ -38,13 +37,12 @@ async def get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None
 
 
 async def update_request_queue(
+    soup: BeautifulSoup,
     request_queue: RequestQueue,
     request: dict,
-    response: Response,
     max_depth: int,
     link_selector: str,
     link_patterns: list[str],
-    beautifulsoup_features: str,
 ) -> None:
     """
     Updates the request queue with new links found in the response.
@@ -55,9 +53,9 @@ async def update_request_queue(
     to avoid exceeding it. Valid links are enqueued with an increased depth in the request queue.
 
     Args:
+        soup: The BeautifulSoup object to get links from.
         request_queue: The request queue to update.
         request: The original request.
-        response: The response object containing the HTML content.
         max_depth: The maximum depth allowed for enqueueing links.
         link_selector: The CSS selector to locate the links in the HTML content.
         link_patterns: The list of regex patterns to match the links against.
@@ -65,7 +63,6 @@ async def update_request_queue(
     Returns:
         None
     """
-    soup = BeautifulSoup(response.content, features=beautifulsoup_features)
     url = request["url"]
     depth = request["userData"]["depth"]
 
