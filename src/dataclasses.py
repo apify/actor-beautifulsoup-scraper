@@ -3,6 +3,7 @@ from typing import Any
 
 from apify import Actor
 from apify.storages import RequestQueue
+from bs4 import BeautifulSoup
 from httpx import Response
 
 
@@ -18,6 +19,9 @@ class ActorInputData:
     max_depth: int
     request_timeout: int
     proxy_configuration: Any
+    soup_features: str | None
+    soup_from_encoding: str | None
+    soup_exclude_encodings: str | None
     page_function: str | None
 
     @classmethod
@@ -31,6 +35,9 @@ class ActorInputData:
             actor_input.get("maxCrawlingDepth", 1),  # default is 1
             actor_input.get("requestTimeout", 10),  # default is 10
             actor_input.get("proxyConfiguration"),
+            actor_input.get("soupFeatures", "html.parser"),  # default is "html.parser"
+            actor_input.get("soupFromEncoding"),
+            actor_input.get("soupExcludeEncodings"),
             actor_input.get("pageFunction"),
         )
 
@@ -53,6 +60,7 @@ class Context:
     Immutable data class representing the context argument provided to the user-defined function.
     """
 
+    soup: BeautifulSoup
     request: dict
-    response: Response
     request_queue: RequestQueue
+    response: Response
