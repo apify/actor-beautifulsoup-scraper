@@ -55,10 +55,10 @@ def page_function(context: Context) -> Any:
 
 ### Context
 
-The code runs in Python 11 and the `page_function` accepts a single argument `context` of type [Context](https://github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py). It is a dataclass with the following fields:
+The code runs in Python 3.11 and the `page_function` accepts a single argument `context` of type [Context](https://github.com/apify/actor-beautifulsoup-scraper/blob/master/src/dataclasses.py). It is a dataclass with the following fields:
 - `soup` of type `BeautifulSoup` with the parsed HTTP payload,
 - `request` of type `dict` with the HTTP request data,
-- `request_queue` of type `apify.storages.RequestQueue` for the interaction with the HTTP request queue,
+- `request_queue` of type [RequestQueue](https://docs.apify.com/sdk/python/reference/class/RequestQueue) for the interaction with the HTTP request queue,
 - `response` of type `httpx.Response` with the HTTP response data.
 
 ## Proxy configuration
