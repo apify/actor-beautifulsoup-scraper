@@ -13,17 +13,17 @@ async def main():
         # Enqueue the starting URLs in the default request queue
         request_queue = await Actor.open_request_queue()
         for start_url in aid.start_urls:
-            url = start_url.get("url")
-            Actor.log.info(f"Enqueuing {url} ...")
-            await request_queue.add_request(request={"url": url, "userData": {"depth": 0}})
+            url = start_url.get('url')
+            Actor.log.info(f'Enqueuing {url} ...')
+            await request_queue.add_request(request={'url': url, 'userData': {'depth': 0}})
 
         user_defined_function = await extract_user_function(aid.page_function)
         proxies = await get_proxies_from_conf(aid.proxy_configuration)
 
         # Process the requests in the queue one by one
         while request := await request_queue.fetch_next_request():
-            url = request["url"]
-            Actor.log.info(f"Scraping {url} ...")
+            url = request['url']
+            Actor.log.info(f'Scraping {url} ...')
 
             try:
                 # Todo: Think about using the same client for the whole request queue. It was discussed here -
@@ -52,7 +52,7 @@ async def main():
                 await execute_user_function(context, user_defined_function)
 
             except:  # pylint: disable=bare-except
-                Actor.log.exception(f"Cannot extract data from {url}.")
+                Actor.log.exception(f'Cannot extract data from {url}.')
 
             finally:
                 # Mark the request as handled so it's not processed again

@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 from .dataclasses import Context
 
-USER_DEFINED_FUNCTION_NAME = "page_function"
+USER_DEFINED_FUNCTION_NAME = 'page_function'
 
 
 async def get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None:
@@ -27,11 +27,11 @@ async def get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None
         conf = await Actor.create_proxy_configuration(actor_proxy_input=proxy_configuration)
 
         if conf is None:
-            Actor.log.error("Creation of proxy configuration failed, exiting...")
+            Actor.log.error('Creation of proxy configuration failed, exiting...')
             await Actor.exit(exit_code=1)
         else:
             proxy_url = await conf.new_url()
-            return {"http://": proxy_url, "https://": proxy_url}
+            return {'http://': proxy_url, 'https://': proxy_url}
 
     return None
 
@@ -63,8 +63,8 @@ async def update_request_queue(
     Returns:
         None
     """
-    url = request["url"]
-    depth = request["userData"]["depth"]
+    url = request['url']
+    depth = request['userData']['depth']
 
     if depth >= max_depth:
         return
@@ -73,7 +73,7 @@ async def update_request_queue(
 
     # If we haven't reached the max depth, look for nested links and enqueue their targets
     for item in items:
-        link_url = urljoin(url, item["href"])
+        link_url = urljoin(url, item['href'])
 
         # Regex matching
         matched = False
@@ -83,15 +83,15 @@ async def update_request_queue(
                 break
 
         if not matched:
-            Actor.log.debug(f"Link URL {link_url} does not match any pattern")
+            Actor.log.debug(f'Link URL {link_url} does not match any pattern')
             continue
 
-        if not link_url.startswith(("http://", "https://")):
-            Actor.log.debug(f"Link URL {link_url} does not start with http/https")
+        if not link_url.startswith(('http://', 'https://')):
+            Actor.log.debug(f'Link URL {link_url} does not start with http/https')
             continue
 
-        Actor.log.info(f"Enqueuing {link_url} ...")
-        await request_queue.add_request(request={"url": link_url, "userData": {"depth": depth + 1}})
+        Actor.log.info(f'Enqueuing {link_url} ...')
+        await request_queue.add_request(request={'url': link_url, 'userData': {'depth': depth + 1}})
 
 
 async def extract_user_function(page_function: str) -> Callable:
@@ -110,7 +110,7 @@ async def extract_user_function(page_function: str) -> Callable:
     Raises:
         KeyError: If the function name `USER_DEFINED_FUNCTION_NAME` cannot be found.
     """
-    scope: dict = {"Context": Context}
+    scope: dict = {'Context': Context}
     exec(page_function, scope)  # pylint: disable=exec-used
 
     try:

@@ -25,30 +25,30 @@ class ActorInputData:
     page_function: str | None
 
     @classmethod
-    async def from_input(cls) -> "ActorInputData":
+    async def from_input(cls) -> 'ActorInputData':
         actor_input = await Actor.get_input() or {}
 
         aid = cls(
-            actor_input.get("startUrls", []),
-            actor_input.get("linkSelector"),
-            actor_input.get("linkPatterns", [".*"]),  # default matches everything
-            actor_input.get("maxCrawlingDepth", 1),  # default is 1
-            actor_input.get("requestTimeout", 10),  # default is 10
-            actor_input.get("proxyConfiguration"),
-            actor_input.get("soupFeatures", "html.parser"),  # default is "html.parser"
-            actor_input.get("soupFromEncoding"),
-            actor_input.get("soupExcludeEncodings"),
-            actor_input.get("pageFunction"),
+            actor_input.get('startUrls', []),
+            actor_input.get('linkSelector'),
+            actor_input.get('linkPatterns', ['.*']),  # default matches everything
+            actor_input.get('maxCrawlingDepth', 1),  # default is 1
+            actor_input.get('requestTimeout', 10),  # default is 10
+            actor_input.get('proxyConfiguration'),
+            actor_input.get('soupFeatures', 'html.parser'),  # default is "html.parser"
+            actor_input.get('soupFromEncoding'),
+            actor_input.get('soupExcludeEncodings'),
+            actor_input.get('pageFunction'),
         )
 
-        Actor.log.debug(f"actor_input = {aid}")
+        Actor.log.debug(f'actor_input = {aid}')
 
         if not aid.start_urls:
-            Actor.log.error("No start URLs specified in actor input, exiting...")
+            Actor.log.error('No start URLs specified in actor input, exiting...')
             await Actor.exit(exit_code=1)
 
         if not aid.page_function:
-            Actor.log.error("No page function specified in actor input, exiting...")
+            Actor.log.error('No page function specified in actor input, exiting...')
             await Actor.exit(exit_code=1)
 
         return aid
