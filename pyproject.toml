@@ -1,3 +1,27 @@
+[tool.flake8]
+docstring-convention = "all" # Google docstring convention + D204 & D401
+filename = ["./src/*.py", "./tests/*.py"]
+ignore = [
+  "D100",
+  "D104",
+  "D203",
+  "D213",
+  "D215",
+  "D401",
+  "D406",
+  "D407",
+  "D408",
+  "D409",
+  "D413",
+  "U101",
+]
+max_line_length = 120
+per-file-ignores = ["tests/*: D"]
+pytest-fixture-no-parentheses = true
+pytest-mark-no-parentheses = true
+unused-arguments-ignore-overload-functions = true
+unused-arguments-ignore-stub-functions = true
+
 [tool.isort]
 include_trailing_comma = true
 known_first_party = []
