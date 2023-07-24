@@ -1,37 +1,57 @@
-[tool.black]
-line-length = 120
-target-version = ['py311']
+[tool.flake8]
+docstring-convention = "all" # Google docstring convention + D204 & D401
+filename = ["./src/*.py", "./tests/*.py"]
+ignore = [
+  "D100",
+  "D104",
+  "D203",
+  "D213",
+  "D215",
+  "D401",
+  "D406",
+  "D407",
+  "D408",
+  "D409",
+  "D413",
+  "U101",
+]
+max_line_length = 120
+per-file-ignores = ["tests/*: D"]
+pytest-fixture-no-parentheses = true
+pytest-mark-no-parentheses = true
+unused-arguments-ignore-overload-functions = true
+unused-arguments-ignore-stub-functions = true
 
 [tool.isort]
+include_trailing_comma = true
 known_first_party = []
 line_length = 120
-multi_line_output = 2
-profile = "black"
+multi_line_output = 3
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+use_parentheses = true
 
 [tool.mypy]
+check_untyped_defs = true
 color_output = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
 error_summary = true
+files = ["src", "tests"]
 ignore_missing_imports = true
+no_implicit_optional = true
 pretty = true
+python_version = 3.11
 show_absolute_path = false
 show_error_codes = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_ignores = true
 
 [tool.pytest]
+asyncio_mode = "auto"
 python_files = "test_*.py"
 testpaths = "tests"
-
-[tool.pylint]
-disable = [
-  "invalid-name",
-  "missing-function-docstring",
-  "missing-module-docstring",
-  "missing-class-docstring",
-  "too-few-public-methods",
-  "too-many-arguments",
-  "too-many-locals",
-  "too-many-instance-attributes",
-  "fixme",
-  "no-member", # because of Actor.log
-]
-max-line-length = 120
+timeout = 1200

@@ -1,6 +1,6 @@
 import re
 from inspect import iscoroutinefunction
-from typing import Callable
+from typing import Callable, cast
 from urllib.parse import urljoin
 
 from apify import Actor
@@ -9,12 +9,11 @@ from bs4 import BeautifulSoup
 
 from .dataclasses import Context
 
-USER_DEFINED_FUNCTION_NAME = "page_function"
+USER_DEFINED_FUNCTION_NAME = 'page_function'
 
 
 async def get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None:
-    """
-    Retrieves the proxies dictionary based on the provided proxy configuration.
+    """Retrieves the proxies dictionary based on the provided proxy configuration.
 
     Args:
         proxy_configuration: The proxy configuration dictionary. If None, no proxies will be used.
@@ -27,11 +26,11 @@ async def get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None
         conf = await Actor.create_proxy_configuration(actor_proxy_input=proxy_configuration)
 
         if conf is None:
-            Actor.log.error("Creation of proxy configuration failed, exiting...")
+            Actor.log.error('Creation of proxy configuration failed, exiting...')
             await Actor.exit(exit_code=1)
         else:
             proxy_url = await conf.new_url()
-            return {"http://": proxy_url, "https://": proxy_url}
+            return {'http://': proxy_url, 'https://': proxy_url}
 
     return None
 
@@ -44,8 +43,7 @@ async def update_request_queue(
     link_selector: str,
     link_patterns: list[str],
 ) -> None:
-    """
-    Updates the request queue with new links found in the response.
+    """Updates the request queue with new links found in the response.
 
     This function parses the HTML content of the response using BeautifulSoup and extracts links based
     on the provided CSS selector. It then checks each link against the specified regex patterns to determine
@@ -63,8 +61,8 @@ async def update_request_queue(
     Returns:
         None
     """
-    url = request["url"]
-    depth = request["userData"]["depth"]
+    url = request['url']
+    depth = request['userData']['depth']
 
     if depth >= max_depth:
         return
@@ -73,7 +71,7 @@ async def update_request_queue(
 
     # If we haven't reached the max depth, look for nested links and enqueue their targets
     for item in items:
-        link_url = urljoin(url, item["href"])
+        link_url = urljoin(url, item['href'])
 
         # Regex matching
         matched = False
@@ -83,20 +81,19 @@ async def update_request_queue(
                 break
 
         if not matched:
-            Actor.log.debug(f"Link URL {link_url} does not match any pattern")
+            Actor.log.debug(f'Link URL {link_url} does not match any pattern')
             continue
 
-        if not link_url.startswith(("http://", "https://")):
-            Actor.log.debug(f"Link URL {link_url} does not start with http/https")
+        if not link_url.startswith(('http://', 'https://')):
+            Actor.log.debug(f'Link URL {link_url} does not start with http/https')
             continue
 
-        Actor.log.info(f"Enqueuing {link_url} ...")
-        await request_queue.add_request(request={"url": link_url, "userData": {"depth": depth + 1}})
+        Actor.log.info(f'Enqueuing {link_url} ...')
+        await request_queue.add_request(request={'url': link_url, 'userData': {'depth': depth + 1}})
 
 
 async def extract_user_function(page_function: str) -> Callable:
-    """
-    Extracts the user-defined function using exec and returns it as a Callable.
+    """Extracts the user-defined function using exec and returns it as a Callable.
 
     This function uses `exec` internally to execute the `page_function` code in a separate scope. The `page_function`
     should be a valid Python code snippet defining a function named `USER_DEFINED_FUNCTION_NAME`.
@@ -110,8 +107,8 @@ async def extract_user_function(page_function: str) -> Callable:
     Raises:
         KeyError: If the function name `USER_DEFINED_FUNCTION_NAME` cannot be found.
     """
-    scope: dict = {"Context": Context}
-    exec(page_function, scope)  # pylint: disable=exec-used
+    scope: dict = {'Context': Context}
+    exec(page_function, scope)
 
     try:
         user_defined_function = scope[USER_DEFINED_FUNCTION_NAME]
@@ -119,12 +116,11 @@ async def extract_user_function(page_function: str) -> Callable:
         Actor.log.error(f'Function name "{USER_DEFINED_FUNCTION_NAME}" could not be found, exiting...')
         await Actor.exit(exit_code=1)
 
-    return user_defined_function
+    return cast(Callable, user_defined_function)
 
 
 async def execute_user_function(context: Context, user_defined_function: Callable) -> None:
-    """
-    Executes the user-defined function with the provided context and pushes data to the Actor.
+    """Executes the user-defined function with the provided context and pushes data to the Actor.
 
     This function checks if the provided user-defined function is a coroutine. If it is, the function is awaited.
     If it is not, it is executed directly.

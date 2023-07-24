@@ -2,7 +2,7 @@
 
 ## Environment
 
-For local development, it is required to have Python 3.10 and newer installed.
+To ensure smooth local development, we highly recommend installing Python 3.11 since the app has been written and tested for compatibility with this version.
 
 It is recommended to set up a virtual environment while developing this Actor to isolate your development environment, however, due to the many varied ways Python can be installed and virtual environments can be set up, this is left up to the developers to do themselves.
 
