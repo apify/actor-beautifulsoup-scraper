@@ -9,9 +9,7 @@ from httpx import Response
 
 @dataclass(frozen=True)
 class ActorInputData:
-    """
-    Immutable data class representing the input data for the Actor.
-    """
+    """Immutable data class representing the input data for the Actor."""
 
     start_urls: list[dict]
     link_selector: str | None
@@ -22,10 +20,11 @@ class ActorInputData:
     soup_features: str | None
     soup_from_encoding: str | None
     soup_exclude_encodings: str | None
-    page_function: str | None
+    page_function: str
 
     @classmethod
     async def from_input(cls) -> 'ActorInputData':
+        """Instatiate the class from Actor input."""
         actor_input = await Actor.get_input() or {}
 
         aid = cls(
@@ -38,7 +37,7 @@ class ActorInputData:
             actor_input.get('soupFeatures', 'html.parser'),  # default is "html.parser"
             actor_input.get('soupFromEncoding'),
             actor_input.get('soupExcludeEncodings'),
-            actor_input.get('pageFunction'),
+            actor_input.get('pageFunction', ''),
         )
 
         Actor.log.debug(f'actor_input = {aid}')
@@ -56,9 +55,7 @@ class ActorInputData:
 
 @dataclass(frozen=True)
 class Context:
-    """
-    Immutable data class representing the context argument provided to the user-defined function.
-    """
+    """Immutable data class representing the context argument provided to the user-defined function."""
 
     soup: BeautifulSoup
     request: dict

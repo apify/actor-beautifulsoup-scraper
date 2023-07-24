@@ -1,0 +1,28 @@
+[flake8]
+filename =
+  ./src/*.py
+  ./tests/*.py
+per-file-ignores =
+  tests/*: D
+
+# Google docstring convention + D204 & D401
+docstring-convention = all
+ignore =
+  D100
+  D104
+  D203
+  D213
+  D215
+  D401
+  D406
+  D407
+  D408
+  D409
+  D413
+  U101
+
+max_line_length = 120
+unused-arguments-ignore-overload-functions = True
+unused-arguments-ignore-stub-functions = True
+pytest-fixture-no-parentheses = True
+pytest-mark-no-parentheses = True

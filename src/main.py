@@ -6,7 +6,8 @@ from .dataclasses import ActorInputData, Context
 from .utils import execute_user_function, extract_user_function, get_proxies_from_conf, update_request_queue
 
 
-async def main():
+async def main() -> None:
+    """Actor main function."""
     async with Actor:
         aid = await ActorInputData.from_input()
 
@@ -51,7 +52,7 @@ async def main():
                 context = Context(soup, request, request_queue, response)
                 await execute_user_function(context, user_defined_function)
 
-            except:  # pylint: disable=bare-except
+            except:  # noqa: B001, E722
                 Actor.log.exception(f'Cannot extract data from {url}.')
 
             finally:
