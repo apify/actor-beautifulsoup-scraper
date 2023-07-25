@@ -1,6 +1,8 @@
 name: Code quality checks
 
 on:
+  push:
+    branches: [master]
   pull_request:
 
 jobs:
