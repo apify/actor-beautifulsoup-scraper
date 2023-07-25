@@ -52,7 +52,7 @@ async def main() -> None:
                 context = Context(soup, request, request_queue, response)
                 await execute_user_function(context, user_defined_function)
 
-            except:  # noqa: B001, E722
+            except BaseException:
                 Actor.log.exception(f'Cannot extract data from {url}.')
 
             finally:

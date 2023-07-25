@@ -10,10 +10,16 @@ One recommended way is with the built-in `venv` module.
 
 ### Venv environment
 
-Create it with Python 3.11:
+Create virtual environment `.venv` with Python 3.11:
 
 ```bash
 python3.11 -m venv .venv
+```
+
+Alternatively:
+
+```bash
+virtualenv --python $(which python3.11) .venv
 ```
 
 Activate it:
