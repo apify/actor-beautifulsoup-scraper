@@ -2,54 +2,18 @@
 
 ## Environment
 
-To ensure smooth local development, we highly recommend installing Python 3.11 since the app has been written and tested for compatibility with this version.
+To ensure smooth local development, we highly recommend installing Python 3.11
+since the app has been written and tested for compatibility with this version.
 
-It is recommended to set up a virtual environment while developing this Actor to isolate your development environment, however, due to the many varied ways Python can be installed and virtual environments can be set up, this is left up to the developers to do themselves.
-
-One recommended way is with the built-in `venv` module.
-
-### Venv environment
-
-Create virtual environment `.venv` with Python 3.11:
-
-```bash
-python3.11 -m venv .venv
-```
-
-Alternatively:
-
-```bash
-virtualenv --python $(which python3.11) .venv
-```
-
-Activate it:
-
-```bash
-source .venv/bin/activate
-```
-
-Check that `python` and `pip` points to the `.venv` location:
-
-```bash
-which python
-```
-
-```bash
-which pip
-```
+We use [Poetry](https://python-poetry.org/) for project management.
 
 ## Dependencies
 
-Install dependencies to run this Actor locally:
+Use make command `install-dev` for installing all the necessary dependencies
+(Poetry and other Python packages specified in `pyproject.toml`):
 
 ```bash
-pip install -r requirements.txt
-```
-
-Install development/test dependencies:
-
-```bash
-pip install -r requirements-test.txt
+make install-dev
 ```
 
 ## Local execution
@@ -77,28 +41,33 @@ apify run --purge
 
 ## Formatting
 
-We use [black](https://pypi.org/project/black/) and [isort](https://pypi.org/project/isort/) to automatically format the code to a common format. All tools are configured in the `pyproject.toml`.
+We use [autopep8](https://github.com/hhatto/autopep8/) and [isort](https://pypi.org/project/isort/)
+to automatically format the code to a common format. All tools are configured in the `pyproject.toml`.
 
-```
-black src/
-```
+Use make command `format` for formatting the code:
 
-```
-isort src/
+```bash
+make format
 ```
 
 ## Linting and type-checking
 
-We use [pylint](https://pypi.org/project/pylint/) for linting and [mypy](https://pypi.org/project/mypy/) for type checking.
+We use [flake8](https://flake8.pycqa.org/) and many of its plugins (see `pyproject.toml`)
+for linting and [mypy](https://pypi.org/project/mypy/) for type checking.
 
-```
-pylint src/
+Use make command `lint` for running the linter:
+
+```bash
+make lint
 ```
 
-```
-mypy src/
+Use make command `type-check` for running the type-checker:
+
+```bash
+make type-check
 ```
 
 ## Documentation
 
-We use the [Google docstring format](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) for documenting the code. We document every user-facing class or method.
+We use the [Google docstring format](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
+for documenting the code. We document every user-facing class or method.
