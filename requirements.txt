@@ -1,8 +1,0 @@
-# Add your dependencies here.
-# See https://pip.pypa.io/en/latest/reference/requirements-file-format/
-# for how to format them
-apify ~= 1.1.1
-beautifulsoup4 ~= 4.12.0
-html5lib ~= 1.1
-httpx ~= 0.24.1
-lxml ~= 4.9.3

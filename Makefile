@@ -1,22 +1,22 @@
 .PHONY: clean install-dev lint type-check check-code format
 
 clean:
-	rm -rf .mypy_cache .pytest_cache __pycache__
+	rm -rf .venv .mypy_cache .pytest_cache __pycache__
 
 install-dev:
-	python -m pip install --upgrade pip
-	pip install --no-cache-dir --requirement requirements.txt
-	pip install --no-cache-dir --requirement requirements-test.txt
-	pre-commit install
+	python3.11 -m pip install --upgrade pip
+	python3.11 -m pip install --no-cache-dir poetry~=1.5.1
+	poetry install --no-interaction --no-ansi
+	poetry run pre-commit install
 
 lint:
-	python3 -m flake8
+	poetry run flake8
 
 type-check:
-	python3 -m mypy
+	poetry run mypy
 
 check-code: lint type-check
 
 format:
-	python3 -m isort src tests
-	python3 -m autopep8 --in-place --recursive src tests
+	poetry run isort src tests
+	poetry run autopep8 --in-place --recursive src tests
