@@ -1,3 +1,6 @@
+[tool.autopep8]
+max_line_length = 120
+
 [tool.flake8]
 docstring-convention = "all" # Google docstring convention + D204 & D401
 filename = ["./src/*.py", "./tests/*.py"]
