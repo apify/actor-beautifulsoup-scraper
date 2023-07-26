@@ -1,4 +1,5 @@
 [tool.poetry]
+# These fields are not used by Apify, fill configs in .actor/ instead
 authors = ["Vlada Dusek <v.dusek96@gmail.com>"]
 description = ""
 name = "beautifulsoup-scraper"
