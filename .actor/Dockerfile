@@ -3,9 +3,9 @@ FROM apify/actor-python:3.11
 RUN rm -rf /usr/src/app/*
 WORKDIR /usr/src/app
 
-COPY pyproject.toml /.
-COPY poetry.toml /.
-COPY poetry.lock /.
+COPY pyproject.toml ./
+COPY poetry.toml ./
+COPY poetry.lock ./
 
 RUN echo "Python version:" \
  && python --version \
