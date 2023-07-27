@@ -18,5 +18,5 @@ type-check:
 check-code: lint type-check
 
 format:
-	poetry run isort src tests
-	poetry run autopep8 --in-place --recursive src tests
+	poetry run isort src
+	poetry run autopep8 --in-place --recursive src
