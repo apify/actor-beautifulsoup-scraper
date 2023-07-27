@@ -16,6 +16,7 @@ RUN echo "Python version:" \
  && echo "Installing dependencies:" \
  && poetry config virtualenvs.create false \
  && poetry install --only main --no-interaction --no-ansi \
+ && rm -rf /tmp/.poetry-cache \
  && echo "All installed Python packages:" \
  && pip freeze
 
