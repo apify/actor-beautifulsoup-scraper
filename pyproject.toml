@@ -46,18 +46,18 @@ max_line_length = 120
 docstring-convention = "all" # Google docstring convention + D204 & D401
 filename = ["./src/*.py", "./tests/*.py"]
 ignore = [
-  "D100",
-  "D104",
-  "D203",
-  "D213",
-  "D215",
-  "D401",
-  "D406",
-  "D407",
-  "D408",
-  "D409",
-  "D413",
-  "U101",
+    "D100",
+    "D104",
+    "D203",
+    "D213",
+    "D215",
+    "D401",
+    "D406",
+    "D407",
+    "D408",
+    "D409",
+    "D413",
+    "U101",
 ]
 max_line_length = 120
 per-file-ignores = ["tests/*: D"]
@@ -82,7 +82,7 @@ disallow_untyped_calls = true
 disallow_untyped_decorators = true
 disallow_untyped_defs = true
 error_summary = true
-files = ["src"] # Todo: add "tests"
+files = ["src"]                    # Todo: add "tests"
 ignore_missing_imports = true
 no_implicit_optional = true
 pretty = true
