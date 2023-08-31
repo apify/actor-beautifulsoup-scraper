@@ -3,9 +3,10 @@ from inspect import iscoroutinefunction
 from typing import Callable, cast
 from urllib.parse import urljoin
 
+from bs4 import BeautifulSoup
+
 from apify import Actor
 from apify.storages import RequestQueue
-from bs4 import BeautifulSoup
 
 from .dataclasses import Context
 

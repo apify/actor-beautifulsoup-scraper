@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from typing import Any
 
-from apify import Actor
-from apify.storages import RequestQueue
 from bs4 import BeautifulSoup
 from httpx import Response
+
+from apify import Actor
+from apify.storages import RequestQueue
 
 
 @dataclass(frozen=True)

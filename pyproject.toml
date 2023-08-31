@@ -68,7 +68,7 @@ unused-arguments-ignore-stub-functions = true
 
 [tool.isort]
 include_trailing_comma = true
-known_first_party = []
+known_first_party = ["apify", "apify_client", "apify_shared"]
 line_length = 120
 multi_line_output = 3
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
@@ -99,3 +99,4 @@ asyncio_mode = "auto"
 python_files = "test_*.py"
 testpaths = "tests"
 timeout = 1200
+include_trailing_comma = true

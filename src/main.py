@@ -1,6 +1,7 @@
-from apify import Actor
 from bs4 import BeautifulSoup
 from httpx import AsyncClient
+
+from apify import Actor
 
 from .dataclasses import ActorInputData, Context
 from .utils import execute_user_function, extract_user_function, get_proxies_from_conf, update_request_queue
