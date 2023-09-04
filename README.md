@@ -23,6 +23,9 @@ In summary, Beautifulsoup Scraper works as follows:
    If a link matches any of the [**Link selector**](#link-selector) and has not yet been visited, add it to the queue.
 5. If there are more items in the queue, repeats step 2, otherwise finish.
 
+See our video guide for more details on how to set up this Actor:
+[web scraping with beautifulsoup](https://www.youtube.com/watch?v=1KqLLuIW6MA)
+
 <!-- TODO: Add Content types section -->
 
 ## Limitations
