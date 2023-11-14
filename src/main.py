@@ -28,8 +28,8 @@ async def main() -> None:
             Actor.log.info(f'Scraping {url} ...')
 
             try:
-                # Todo: Think about using the same client for the whole request queue. It was discussed here -
-                # https://github.com/apify/actor-beautifulsoup-scraper/pull/1#pullrequestreview-1518377074.
+                # The usage of the same HTTPX client for the whole request queue was discussed here
+                # https://github.com/apify/actor-beautifulsoup-scraper/pull/1#pullrequestreview-1518377074
                 async with AsyncClient(proxies=proxies) as client:
                     response = await client.get(url, timeout=aid.request_timeout)
 

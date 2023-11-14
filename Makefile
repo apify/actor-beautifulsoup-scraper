@@ -1,7 +1,9 @@
 .PHONY: clean install-dev lint type-check check-code format
 
+DIRS_WITH_CODE = src
+
 clean:
-	rm -rf .venv .mypy_cache .pytest_cache __pycache__
+	rm -rf .venv .mypy_cache .pytest_cache .ruff_cache __pycache__
 
 install-dev:
 	python3.11 -m pip install --upgrade pip
@@ -10,13 +12,13 @@ install-dev:
 	poetry run pre-commit install
 
 lint:
-	poetry run flake8
+	poetry run ruff check $(DIRS_WITH_CODE)
 
 type-check:
-	poetry run mypy
+	poetry run mypy $(DIRS_WITH_CODE)
 
 check-code: lint type-check
 
 format:
-	poetry run isort src
-	poetry run autopep8 --in-place --recursive src
+	poetry run ruff check --fix $(DIRS_WITH_CODE)
+	poetry run ruff format $(DIRS_WITH_CODE)

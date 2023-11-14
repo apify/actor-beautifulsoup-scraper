@@ -1,20 +1,25 @@
+from __future__ import annotations
+
 import re
 from inspect import iscoroutinefunction
-from typing import Callable, cast
+from typing import TYPE_CHECKING, Callable, cast
 from urllib.parse import urljoin
 
-from bs4 import BeautifulSoup
-
 from apify import Actor
-from apify.storages import RequestQueue
 
 from .dataclasses import Context
+
+if TYPE_CHECKING:
+    from bs4 import BeautifulSoup
+
+    from apify.storages import RequestQueue
+
 
 USER_DEFINED_FUNCTION_NAME = 'page_function'
 
 
 async def get_proxies_from_conf(proxy_configuration: dict | None) -> dict | None:
-    """Retrieves the proxies dictionary based on the provided proxy configuration.
+    """Retrieve the proxies dictionary based on the provided proxy configuration.
 
     Args:
         proxy_configuration: The proxy configuration dictionary. If None, no proxies will be used.
@@ -44,7 +49,7 @@ async def update_request_queue(
     link_selector: str,
     link_patterns: list[str],
 ) -> None:
-    """Updates the request queue with new links found in the response.
+    """Update the request queue with new links found in the response.
 
     This function parses the HTML content of the response using BeautifulSoup and extracts links based
     on the provided CSS selector. It then checks each link against the specified regex patterns to determine
@@ -94,7 +99,7 @@ async def update_request_queue(
 
 
 async def extract_user_function(page_function: str) -> Callable:
-    """Extracts the user-defined function using exec and returns it as a Callable.
+    """Extract the user-defined function using exec and returns it as a Callable.
 
     This function uses `exec` internally to execute the `page_function` code in a separate scope. The `page_function`
     should be a valid Python code snippet defining a function named `USER_DEFINED_FUNCTION_NAME`.
@@ -121,7 +126,7 @@ async def extract_user_function(page_function: str) -> Callable:
 
 
 async def execute_user_function(context: Context, user_defined_function: Callable) -> None:
-    """Executes the user-defined function with the provided context and pushes data to the Actor.
+    """Execute the user-defined function with the provided context and pushes data to the Actor.
 
     This function checks if the provided user-defined function is a coroutine. If it is, the function is awaited.
     If it is not, it is executed directly.
