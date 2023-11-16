@@ -1,11 +1,15 @@
-from dataclasses import dataclass
-from typing import Any
+from __future__ import annotations
 
-from bs4 import BeautifulSoup
-from httpx import Response
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any
 
 from apify import Actor
-from apify.storages import RequestQueue
+
+if TYPE_CHECKING:
+    from bs4 import BeautifulSoup
+    from httpx import Response
+
+    from apify.storages import RequestQueue
 
 
 @dataclass(frozen=True)
@@ -24,7 +28,7 @@ class ActorInputData:
     page_function: str
 
     @classmethod
-    async def from_input(cls) -> 'ActorInputData':
+    async def from_input(cls: type[ActorInputData]) -> ActorInputData:
         """Instatiate the class from Actor input."""
         actor_input = await Actor.get_input() or {}
 
