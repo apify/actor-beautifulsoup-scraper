@@ -64,6 +64,7 @@ include_trailing_comma = true
 line-length = 120
 select = ["ALL"]
 ignore = [
+    "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed in {filename}
     "BLE001",  # Do not catch blind exception
     "COM812",  # This rule may cause conflicts when used with the formatter
     "D100",    # Missing docstring in public module
