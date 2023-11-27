@@ -7,7 +7,7 @@ clean:
 
 install-dev:
 	python3.11 -m pip install --upgrade pip
-	python3.11 -m pip install --no-cache-dir poetry~=1.5.1
+	python3.11 -m pip install --no-cache-dir poetry~=1.7.1
 	poetry install --no-interaction --no-ansi
 	poetry run pre-commit install
 

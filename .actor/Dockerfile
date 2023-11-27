@@ -12,7 +12,7 @@ RUN echo "Python version:" \
  && echo "Pip version:" \
  && pip --version \
  && echo "Installing Poetry:" \
- && pip install --no-cache-dir poetry~=1.5.1 \
+ && pip install --no-cache-dir poetry~=1.7.1 \
  && echo "Installing dependencies:" \
  && poetry config virtualenvs.create false \
  && poetry install --only main --no-interaction --no-ansi \
