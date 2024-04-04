@@ -2,7 +2,7 @@
 
 ## Environment
 
-To ensure smooth local development, we highly recommend installing Python 3.11
+To ensure smooth local development, we highly recommend installing Python 3.12
 since the app has been written and tested for compatibility with this version.
 
 We use [Poetry](https://python-poetry.org/) for project management.

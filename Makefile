@@ -6,9 +6,8 @@ clean:
 	rm -rf .venv .mypy_cache .pytest_cache .ruff_cache __pycache__
 
 install-dev:
-	python3.11 -m pip install --upgrade pip
-	python3.11 -m pip install --no-cache-dir poetry~=1.7.1
-	poetry install --no-interaction --no-ansi
+	python3 -m pip install --upgrade pip poetry
+	poetry install
 	poetry run pre-commit install
 
 lint:
