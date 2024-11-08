@@ -1,10 +1,9 @@
-from bs4 import BeautifulSoup
-from httpx import AsyncClient
+from crawlee.beautifulsoup_crawler import BeautifulSoupCrawler, BeautifulSoupCrawlingContext
 
 from apify import Actor
 
-from .dataclasses import ActorInputData, Context
-from .utils import execute_user_function, extract_user_function, get_proxies_from_conf, update_request_queue
+from .input_handling import ActorInputData
+from .utils import execute_user_function
 
 
 async def main() -> None:
@@ -12,50 +11,20 @@ async def main() -> None:
     async with Actor:
         aid = await ActorInputData.from_input()
 
-        # Enqueue the starting URLs in the default request queue
-        request_queue = await Actor.open_request_queue()
-        for start_url in aid.start_urls:
-            url = start_url.get('url')
-            Actor.log.info(f'Enqueuing {url} ...')
-            await request_queue.add_request(request={'url': url, 'userData': {'depth': 0}})
+        crawler = BeautifulSoupCrawler(
+            parser=aid.soup_features,
+            max_crawl_depth=aid.max_depth,
+            proxy_configuration=aid.proxy_configuration,
+            request_handler_timeout=aid.request_timeout,
+        )
 
-        user_defined_function = await extract_user_function(aid.page_function)
-        proxies = await get_proxies_from_conf(aid.proxy_configuration)
+        @crawler.router.default_handler
+        async def request_handler(context: BeautifulSoupCrawlingContext) -> None:
+            # Process the request.
+            Actor.log.info(f'Scraping {context.request.url} ...')
+            await execute_user_function(context, aid.user_function)
 
-        # Process the requests in the queue one by one
-        while request := await request_queue.fetch_next_request():
-            url = request['url']
-            Actor.log.info(f'Scraping {url} ...')
+            if aid.link_selector:
+                await context.enqueue_links(selector=aid.link_selector, include=aid.link_patterns)
 
-            try:
-                # The usage of the same HTTPX client for the whole request queue was discussed here
-                # https://github.com/apify/actor-beautifulsoup-scraper/pull/1#pullrequestreview-1518377074
-                async with AsyncClient(proxies=proxies) as client:
-                    response = await client.get(url, timeout=aid.request_timeout)
-
-                soup = BeautifulSoup(
-                    response.content,
-                    features=aid.soup_features,
-                    from_encoding=aid.soup_from_encoding,
-                    exclude_encodings=aid.soup_exclude_encodings,
-                )
-
-                if aid.link_selector:
-                    await update_request_queue(
-                        soup,
-                        request_queue,
-                        request,
-                        aid.max_depth,
-                        aid.link_selector,
-                        aid.link_patterns,
-                    )
-
-                context = Context(soup, request, request_queue, response)
-                await execute_user_function(context, user_defined_function)
-
-            except BaseException:
-                Actor.log.exception(f'Cannot extract data from {url} .')
-
-            finally:
-                # Mark the request as handled so it's not processed again
-                await request_queue.mark_request_as_handled(request)
+        await crawler.run(aid.start_urls)
