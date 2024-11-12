@@ -46,8 +46,9 @@ Example:
 
 ```python
 from typing import Any
+from crawlee.beautifulsoup_crawler import BeautifulSoupCrawlingContext
 
-def page_function(context: Context) -> Any:
+def page_function(context: BeautifulSoupCrawlingContext) -> Any:
     url = context.request["url"]
     title = context.soup.title.string if context.soup.title else None
     return {"url": url, "title": title}
@@ -55,11 +56,8 @@ def page_function(context: Context) -> Any:
 
 ### Context
 
-The code runs in Python 3.12 and the `page_function` accepts a single argument `context` of type [Context](https://github.com/apify/-beautifulsoup-scraper/blob/master/src/dataclasses.py). It is a dataclass with the following fields:
-- `soup` of type `BeautifulSoup` with the parsed HTTP payload,
-- `request` of type `dict` with the HTTP request data,
-- `request_queue` of type `apify.storages.RequestQueue` ([RequestQueue](https://docs.apify.com/sdk/python/reference/class/RequestQueue)) for the interaction with the HTTP request queue,
-- `response` of type `httpx.Response` with the HTTP response data.
+The code runs in Python 3.12 and the `page_function` accepts a single argument `context` of type [BeautifulSoupCrawlingContext](https://crawlee.dev/python/api/class/BeautifulSoupCrawlingContext). See documentation link for further details
+
 
 ## Proxy configuration
 

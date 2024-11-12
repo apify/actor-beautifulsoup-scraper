@@ -1,21 +1,16 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
 from datetime import timedelta
 from re import Pattern
-from typing import TYPE_CHECKING, Callable, Literal, Sequence, cast
+from typing import Callable, Sequence, cast
 
+from crawlee import Glob
+from crawlee.beautifulsoup_crawler import BeautifulSoupParser
 from pydantic import BaseModel, ConfigDict, Field
 
 from apify import Actor, ProxyConfiguration
 from src.utils import USER_DEFINED_FUNCTION_NAME
-
-if TYPE_CHECKING:
-    from bs4 import BeautifulSoup
-    from crawlee import Glob
-    from crawlee.storages import RequestQueue
-    from httpx import Response
 
 
 class ActorInputData(BaseModel):
@@ -29,9 +24,7 @@ class ActorInputData(BaseModel):
     max_depth: int = Field(0, ge=0)
     request_timeout: timedelta = Field(timedelta(seconds=10), gt=timedelta(seconds=0))
     proxy_configuration: ProxyConfiguration
-    soup_features: Literal[
-        'html.parser', 'lxml', 'xml', 'html5lib'
-    ]  # TODO: Define this type in crawlee and import it here
+    soup_features: BeautifulSoupParser
     user_function: Callable
 
     @classmethod

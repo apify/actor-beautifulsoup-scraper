@@ -1,6 +1,6 @@
 {
   "actorSpecification": 1,
-  "name": "store-beautifulsoup-scraperTEST",
+  "name": "store-beautifulsoup-scraper",
   "title": "Getting started with Python and BeautifulSoup",
   "description": "Crawls websites using raw HTTP requests. It parses the HTML with the BeautifulSoup library and extracts data from the pages using Python code. Supports both recursive crawling and lists of URLs. This actor is a Python alternative to Cheerio Scraper.",
   "version": "0.1",

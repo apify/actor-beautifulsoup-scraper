@@ -15,7 +15,7 @@ html5lib = "^1.1"
 httpx = "^0.27.0"
 lxml = "^5.2.1"
 types-beautifulsoup4 = "^4.12.0.20240229"
-crawlee = {version = "^0.4.1b5", extras = ["beautifulsoup4"]}
+crawlee = {version = "^0.4.1", extras = ["beautifulsoup4"]}
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.23.0"
@@ -84,6 +84,8 @@ indent-style = "space"
     "T20",     # flake8-print
     "TRY301",  # Abstract `raise` to an inner function
 ]
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
 
 [tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
