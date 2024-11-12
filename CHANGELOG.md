@@ -2,7 +2,7 @@
 
 ## 0.2 (2024-11-12)
 
-- Updated to use crawlee.
+- Updated to use Crawlee.
 - Removed inputs: soupFromEncoding, soupExcludeEncodings
 
 
