@@ -1,7 +1,7 @@
 {
   "title": "BeautifulSoup Scraper",
   "type": "object",
-  "description": "Beautifulsoup Scraper loads <b>Start URLs</b> using HTTP requests and then executes <b>Page function</b> for each page to extract data from it. To follow links and scrape additional pages, set <b>Link selector</b> with <b>Link patterns</b> to specify which links to follow. Alternatively, you can manually enqueue new links in the <b>Page function</b>. For details, see the actor's <a href='https://apify.com/apify/store-beautifulsoup-scraper' target='_blank' rel='noopener'>README</a>.",
+  "description": "Beautifulsoup Scraper loads <b>Start URLs</b> using HTTP requests and then executes <b>Page function</b> for each page to extract data from it. To follow links and scrape additional pages, set <b>Link selector</b> with <b>Link patterns</b> to specify which links to follow. Alternatively, you can manually enqueue new links in the <b>Page function</b>. For details, see the actor's <a href='https://github.com/apify/actor-beautifulsoup-scraper/blob/master/README.md' target='_blank' rel='noopener'>README</a>.",
   "schemaVersion": 1,
   "properties": {
     "startUrls": {
