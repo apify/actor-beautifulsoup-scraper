@@ -46,7 +46,7 @@ Example:
 
 ```python
 from typing import Any
-from crawlee.beautifulsoup_crawler import BeautifulSoupCrawlingContext
+from crawlee.crawlers import BeautifulSoupCrawlingContext
 
 def page_function(context: BeautifulSoupCrawlingContext) -> Any:
     url = context.request["url"]

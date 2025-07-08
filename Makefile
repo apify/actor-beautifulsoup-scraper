@@ -1,23 +1,22 @@
-.PHONY: clean install-dev lint type-check check-code format
+# This is used by the Github Actions to run the static analysis.
 
-DIRS_WITH_CODE = src
+.PHONY: clean install-dev lint type-check format check-code
 
 clean:
-	rm -rf .venv .mypy_cache .pytest_cache .ruff_cache __pycache__
+	rm -rf .mypy_cache .pytest_cache .ruff_cache build dist htmlcov .coverage
 
 install-dev:
-	python3 -m pip install --upgrade pip poetry
-	poetry install
-	poetry run pre-commit install
+	uv sync --all-extras
 
 lint:
-	poetry run ruff check $(DIRS_WITH_CODE)
+	uv run ruff format --check
+	uv run ruff check
 
 type-check:
-	poetry run mypy $(DIRS_WITH_CODE)
-
-check-code: lint type-check
+	uv run mypy
 
 format:
-	poetry run ruff check --fix $(DIRS_WITH_CODE)
-	poetry run ruff format $(DIRS_WITH_CODE)
+	uv run ruff check --fix
+	uv run ruff format
+
+check-code: lint type-check

@@ -1,6 +1,5 @@
-from crawlee.beautifulsoup_crawler import BeautifulSoupCrawler, BeautifulSoupCrawlingContext
-
 from apify import Actor
+from crawlee.crawlers import BeautifulSoupCrawler, BeautifulSoupCrawlingContext
 
 from .input_handling import ActorInputData
 from .utils import execute_user_function

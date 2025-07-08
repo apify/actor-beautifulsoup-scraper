@@ -1,25 +1,32 @@
-FROM apify/actor-python:3.12
+FROM apify/actor-python:3.13
 
-RUN rm -rf /usr/src/app/*
+ENV ACTOR_DIR="src"
+ENV UV_VERSION="0.7"
+
 WORKDIR /usr/src/app
 
+# Install Debian packages.
+RUN apt-get update && \
+    apt-get install -yq --no-install-recommends \
+        git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install uv package manager.
+RUN pip install --upgrade pip && \
+    pip install uv~=${UV_VERSION}
+
+# Copy python config files and install dependencies.
 COPY pyproject.toml ./
-COPY poetry.toml ./
-COPY poetry.lock ./
+COPY uv.lock ./
+RUN uv export --no-hashes --no-dev | \
+    pip install --requirement /dev/stdin --no-dependencies
 
-RUN echo "Python version:" \
-    && python --version \
-    && echo "Pip version:" \
-    && pip --version \
-    && echo "Installing Poetry:" \
-    && pip install --no-cache-dir poetry~=1.8 \
-    && echo "Installing dependencies:" \
-    && poetry config virtualenvs.create false \
-    && poetry install --only main --no-interaction --no-ansi \
-    && rm -rf /tmp/.poetry-cache \
-    && echo "All installed Python packages:" \
-    && pip freeze
+# Copy the source code of the Actor.
+COPY .actor ./.actor
+COPY ${ACTOR_DIR}/ ./${ACTOR_DIR}/
 
-COPY . ./
+# Use compileall to ensure the runnability of the Actor Python code.
+RUN uv run python -m compileall -q ${ACTOR_DIR}
 
-CMD ["python3", "-m", "src"]
+# Specify how to launch the source code of your Actor.
+CMD ["sh", "-c", "uv run python -m ${ACTOR_DIR}"]
