@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable, Sequence  # noqa: TC003 # pydantic
 from datetime import timedelta
 from re import Pattern
-from typing import Callable, Sequence, cast
-
-from crawlee import Glob
-from crawlee.beautifulsoup_crawler import BeautifulSoupParser
-from pydantic import BaseModel, ConfigDict, Field
+from typing import cast
 
 from apify import Actor, ProxyConfiguration
+from crawlee import Glob  # noqa: TC002 # pydantic
+from crawlee.crawlers import BeautifulSoupParserType  # noqa: TC002 # pydantic
+from pydantic import BaseModel, ConfigDict, Field
+
 from src.utils import USER_DEFINED_FUNCTION_NAME
 
 
@@ -24,7 +25,7 @@ class ActorInputData(BaseModel):
     max_depth: int = Field(0, ge=0)
     request_timeout: timedelta = Field(timedelta(seconds=10), gt=timedelta(seconds=0))
     proxy_configuration: ProxyConfiguration
-    soup_features: BeautifulSoupParser
+    soup_features: BeautifulSoupParserType
     user_function: Callable
 
     @classmethod
@@ -82,7 +83,7 @@ async def extract_user_function(page_function: str) -> Callable:
         KeyError: If the function name `USER_DEFINED_FUNCTION_NAME` cannot be found.
     """
     scope: dict = {}
-    exec(page_function, scope)
+    exec(page_function, scope)  # noqa: S102
 
     try:
         user_defined_function = scope[USER_DEFINED_FUNCTION_NAME]
@@ -90,4 +91,4 @@ async def extract_user_function(page_function: str) -> Callable:
         Actor.log.error(f'Function name "{USER_DEFINED_FUNCTION_NAME}" could not be found, exiting...')
         await Actor.exit(exit_code=1)
 
-    return cast(Callable, user_defined_function)
+    return cast('Callable', user_defined_function)

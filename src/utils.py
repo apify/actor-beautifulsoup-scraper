@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from inspect import iscoroutinefunction
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from apify import Actor
 
 if TYPE_CHECKING:
-    from crawlee.beautifulsoup_crawler import BeautifulSoupCrawlingContext
+    from collections.abc import Callable
+
+    from crawlee.crawlers import BeautifulSoupCrawlingContext
 
 USER_DEFINED_FUNCTION_NAME = 'page_function'
 
