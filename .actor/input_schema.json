@@ -1,4 +1,5 @@
 {
+  "$schema": "https://apify.com/schemas/v1/input.ide.json",
   "title": "BeautifulSoup Scraper",
   "type": "object",
   "description": "Beautifulsoup Scraper loads <b>Start URLs</b> using HTTP requests and then executes <b>Page function</b> for each page to extract data from it. To follow links and scrape additional pages, set <b>Link selector</b> with <b>Link patterns</b> to specify which links to follow. Alternatively, you can manually enqueue new links in the <b>Page function</b>. For details, see the actor's <a href='https://github.com/apify/actor-beautifulsoup-scraper/blob/master/README.md' target='_blank' rel='noopener'>README</a>.",
@@ -23,8 +24,8 @@
     "requestTimeout": {
       "title": "Request timeout",
       "type": "integer",
-      "description": "The maximum duration (in seconds) for the request to complete before timing out. The timeout value is passed to the <code>httpx.AsyncClient</code> object.",
-      "minimum": 0,
+      "description": "The maximum duration (in seconds) that processing a single page may take before it times out. This limits the request handler that runs your <b>Page function</b>.",
+      "minimum": 1,
       "prefill": 10,
       "default": 10
     },
@@ -45,17 +46,20 @@
     "pageFunction": {
       "title": "Page function",
       "type": "string",
-      "description": "A Python function, that is executed for every page. Use it to scrape data from the page, perform actions or add new URLs to the request queue. The page function has its own naming scope and you can import any installed modules. Typically you would want to obtain the data from the <code>context.soup</code> object and return them. Identifier <code>page_function</code> can't be changed. For more information about the <code>context</code> object you get into the <code>page_function</code> check the <a href='https://github.com/apify/actor-beautifulsoup-scraper#context' target='_blank' rel='noopener'>github.com/apify/actor-beautifulsoup-scraper#context</a>. Asynchronous functions are supported.",
+      "description": "A Python function, that is executed for every page. Use it to scrape data from the page, perform actions or add new URLs to the request queue. The page function has its own naming scope and you can import any installed modules. Typically you would want to obtain the data from the <code>context.soup</code> object and return them. Identifier <code>page_function</code> can't be changed. For the fields available on the <code>context</code> object, see the <a href='https://crawlee.dev/python/api/class/BeautifulSoupCrawlingContext' target='_blank' rel='noopener'>BeautifulSoupCrawlingContext</a> reference. Asynchronous functions are supported.",
       "editor": "python",
-      "prefill": "from typing import Any\nfrom crawlee.crawlers import BeautifulSoupCrawlingContext\n\n# See the context section in readme to find out what fields you can access \n# https://apify.com/apify/beautifulsoup-scraper#context    \ndef page_function(context: BeautifulSoupCrawlingContext) -> Any:\n    url = context.request.url\n    title = context.soup.title.string if context.soup.title else None\n    return {'url': url, 'title': title}\n"
+      "prefill": "from typing import Any\nfrom crawlee.crawlers import BeautifulSoupCrawlingContext\n\n# See what fields the context object provides:\n# https://crawlee.dev/python/api/class/BeautifulSoupCrawlingContext\ndef page_function(context: BeautifulSoupCrawlingContext) -> Any:\n    url = context.request.url\n    title = context.soup.title.string if context.soup.title else None\n    return {'url': url, 'title': title}\n"
     },
     "soupFeatures": {
       "sectionCaption": "Advanced BeautifulSoup configuration",
-      "title": "BeautifulSoup features",
+      "title": "BeautifulSoup parser",
       "type": "string",
-      "description": "The value of BeautifulSoup <code>features</code> argument. From BeautifulSoup docs: Desirable features of the parser to be used. This may be the name of a specific parser (\"lxml\", \"lxml-xml\", \"html.parser\", or \"html5lib\") or it may be the type of markup to be used (\"html\", \"html5\", \"xml\"). It's recommended that you name a specific parser, so that Beautiful Soup gives you the same results across platforms and virtual environments.",
-      "editor": "textfield",
-      "prefill": "html.parser"
+      "description": "The parser BeautifulSoup uses for each page (its <code>features</code> argument). Naming a specific parser keeps results consistent across platforms. Only the parsers bundled with this Actor are available.",
+      "editor": "select",
+      "enum": ["html.parser", "lxml", "xml", "html5lib"],
+      "enumTitles": ["html.parser (built-in)", "lxml (fast HTML)", "xml (lxml XML)", "html5lib (lenient, slowest)"],
+      "prefill": "html.parser",
+      "default": "html.parser"
     },
     "proxyConfiguration": {
       "sectionCaption": "Proxy and HTTP configuration",

@@ -1,0 +1,101 @@
+from __future__ import annotations
+
+import re
+from collections.abc import Callable, Sequence  # noqa: TC003 # pydantic
+from datetime import timedelta
+from re import Pattern
+from typing import NoReturn, cast
+
+from apify import Actor, ProxyConfiguration
+from crawlee import Glob  # noqa: TC002 # pydantic
+from crawlee.crawlers import BeautifulSoupParserType  # noqa: TC002 # pydantic
+from pydantic import BaseModel, ConfigDict, Field
+
+from actor_beautifulsoup_scraper.utils import USER_DEFINED_FUNCTION_NAME
+
+
+async def _fail(message: str) -> NoReturn:
+    """Log an error and terminate the run with a non-zero exit code.
+
+    `Actor.exit()` raises `SystemExit` on the platform; the explicit raise guarantees the same
+    locally (where the process is not necessarily torn down), so callers never fall through to
+    use values that were never assigned. The `NoReturn` annotation lets the type checker know
+    control stops here.
+    """
+    Actor.log.error(message)
+    await Actor.exit(exit_code=1)
+    raise SystemExit(1)
+
+
+class ActorInputData(BaseModel):
+    """Processed and cleaned inputs for the actor."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    start_urls: Sequence[str]
+    link_selector: str = ''
+    link_patterns: list[Pattern | Glob] = []
+    max_depth: int = Field(1, ge=0)
+    request_timeout: timedelta = Field(timedelta(seconds=10), gt=timedelta(seconds=0))
+    proxy_configuration: ProxyConfiguration
+    soup_features: BeautifulSoupParserType
+    user_function: Callable
+
+    @classmethod
+    async def from_input(cls) -> ActorInputData:
+        """Instantiate the class from Actor input."""
+        actor_input = await Actor.get_input() or {}
+
+        if not (start_urls := actor_input.get('startUrls', [])):
+            await _fail('No start URLs specified in actor input, exiting...')
+
+        if not (page_function := actor_input.get('pageFunction', '')):
+            await _fail('No page function specified in actor input, exiting...')
+
+        proxy_configuration = await Actor.create_proxy_configuration(
+            actor_proxy_input=actor_input.get('proxyConfiguration')
+        )
+        if proxy_configuration is None:
+            await _fail('Creation of proxy configuration failed, exiting...')
+
+        # An explicit empty list means "no restriction" -> match everything, same as omitting it.
+        link_patterns = actor_input.get('linkPatterns') or ['.*']
+
+        aid = cls(
+            start_urls=[start_url['url'] for start_url in start_urls],
+            link_selector=actor_input.get('linkSelector', ''),
+            link_patterns=[re.compile(pattern) for pattern in link_patterns],
+            max_depth=actor_input.get('maxCrawlingDepth', 1),
+            request_timeout=timedelta(seconds=actor_input.get('requestTimeout', 10)),
+            proxy_configuration=proxy_configuration,
+            soup_features=actor_input.get('soupFeatures', 'html.parser'),
+            user_function=await extract_user_function(page_function),
+        )
+
+        Actor.log.debug(f'actor_input = {aid}')
+
+        return aid
+
+
+async def extract_user_function(page_function: str) -> Callable:
+    """Extract the user-defined function using exec and returns it as a Callable.
+
+    This function uses `exec` internally to execute the `user_function` code in a separate scope. The `user_function`
+    should be a valid Python code snippet defining a function named `USER_DEFINED_FUNCTION_NAME`.
+
+    Args:
+        page_function: The string representation of the user-defined function.
+
+    Returns:
+        The extracted user-defined function.
+
+    Raises:
+        KeyError: If the function name `USER_DEFINED_FUNCTION_NAME` cannot be found.
+    """
+    scope: dict = {}
+    exec(page_function, scope)  # noqa: S102
+
+    try:
+        return cast('Callable', scope[USER_DEFINED_FUNCTION_NAME])
+    except KeyError:
+        await _fail(f'Function name "{USER_DEFINED_FUNCTION_NAME}" could not be found, exiting...')

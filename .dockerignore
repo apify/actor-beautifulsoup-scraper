@@ -1,0 +1,35 @@
+# Git metadata and CI config - not needed inside the image.
+.git
+.github
+
+# Python bytecode.
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Tool caches - we use ruff (lint/format) and ty (type-check).
+.ruff_cache/
+.ty_cache/
+
+# Virtual environments - recreated by `uv sync` in the image.
+.venv
+.env
+env/
+venv/
+ENV/
+
+# Local Actor storage.
+storage
+
+# Build artifacts.
+build/
+dist/
+*.egg-info/
+
+# Editor / OS noise.
+.idea/
+.vscode
+.zed
+.mise.toml
+.nvim.lua

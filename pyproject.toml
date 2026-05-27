@@ -3,22 +3,25 @@ name = "beautifulsoup-scraper"
 version = "0.0.0" # not used by Apify
 description = "" # not used by Apify
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
-    "apify < 3.0.0",
+    "apify >= 3.0.0, < 4.0.0",
     "crawlee[beautifulsoup]",
 ]
 
 [dependency-groups]
 dev = [
-    "poethepoet<1.0.0",
-    "ruff~=0.14.0",
-    "ty~=0.0.0",
+    "poethepoet",
+    "ruff",
+    "ty",
 ]
+
+[tool.uv]
+package = false
 
 [tool.ruff]
 line-length = 120
-include = ["src/**/*.py"]
+include = ["actor_beautifulsoup_scraper/**/*.py"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -49,18 +52,17 @@ docstring-quotes = "double"
 inline-quotes = "single"
 
 [tool.ty.environment]
-python-version = "3.13"
+python-version = "3.14"
 
 [tool.ty.src]
-include = ["src"]
+include = ["actor_beautifulsoup_scraper"]
 
-# The src directory uses relative imports as it's run as a package (python -m src).
-# ty doesn't fully support this pattern yet, so we ignore unresolved-import errors.
+# Run as `python -m actor_beautifulsoup_scraper` from the repo root; ty doesn't fully
+# resolve this run-as-package pattern yet, so we ignore unresolved-import errors.
 [tool.ty.rules]
 unresolved-import = "ignore"
 
 [tool.poe.tasks]
-clean = "rm -rf .ty_cache .pytest_cache .ruff_cache build dist htmlcov .coverage"
 install-dev = "uv sync --all-extras"
 type-check = "uv run ty check"
 check-code = ["lint", "type-check"]
@@ -70,3 +72,10 @@ shell = "uv run ruff format --check && uv run ruff check"
 
 [tool.poe.tasks.format]
 shell = "uv run ruff check --fix && uv run ruff format"
+
+[tool.poe.tasks.clean]
+shell = """
+rm -rf .ruff_cache .ty_cache .venv
+find . -type d -name __pycache__ -prune -exec rm -rf {} +
+uv cache clean
+"""
