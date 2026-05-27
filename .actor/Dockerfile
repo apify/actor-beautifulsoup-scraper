@@ -1,6 +1,6 @@
 FROM apify/actor-python:3.13
 
-ENV ACTOR_DIR="src"
+ENV ACTOR_DIR="actor_beautifulsoup_scraper"
 ENV UV_VERSION="0.8"
 
 WORKDIR /usr/src/app

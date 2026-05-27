@@ -11,7 +11,7 @@ from crawlee import Glob  # noqa: TC002 # pydantic
 from crawlee.crawlers import BeautifulSoupParserType  # noqa: TC002 # pydantic
 from pydantic import BaseModel, ConfigDict, Field
 
-from src.utils import USER_DEFINED_FUNCTION_NAME
+from actor_beautifulsoup_scraper.utils import USER_DEFINED_FUNCTION_NAME
 
 
 class ActorInputData(BaseModel):

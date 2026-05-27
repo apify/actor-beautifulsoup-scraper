@@ -21,7 +21,7 @@ package = false
 
 [tool.ruff]
 line-length = 120
-include = ["src/**/*.py"]
+include = ["actor_beautifulsoup_scraper/**/*.py"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -55,10 +55,10 @@ inline-quotes = "single"
 python-version = "3.13"
 
 [tool.ty.src]
-include = ["src"]
+include = ["actor_beautifulsoup_scraper"]
 
-# The src directory uses relative imports as it's run as a package (python -m src).
-# ty doesn't fully support this pattern yet, so we ignore unresolved-import errors.
+# Run as `python -m actor_beautifulsoup_scraper` from the repo root; ty doesn't fully
+# resolve this run-as-package pattern yet, so we ignore unresolved-import errors.
 [tool.ty.rules]
 unresolved-import = "ignore"
 
