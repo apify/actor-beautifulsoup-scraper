@@ -1,32 +1,35 @@
+# syntax=docker/dockerfile:1
 FROM apify/actor-python:3.13
 
-ENV ACTOR_DIR="actor_beautifulsoup_scraper"
-ENV UV_VERSION="0.8"
+# Bring in the uv binary from its official image (pinned to the 0.11.x line), instead of pip-installing it.
+COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
+
+# uv configuration for reproducible, fast container builds:
+#  - compile bytecode so the Actor starts a touch faster,
+#  - copy instead of hardlink, which avoids warnings across the cache mount,
+#  - never fetch a managed Python; reuse the base image's interpreter,
+#  - put the project venv first on PATH so `python` is the venv's python.
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=0 \
+    PATH="/usr/src/app/.venv/bin:$PATH"
 
 WORKDIR /usr/src/app
 
-# Install Debian packages.
-RUN apt-get update && \
-    apt-get install -yq --no-install-recommends \
-        git && \
-    rm -rf /var/lib/apt/lists/*
+# Install dependencies in their own layer. The uv cache mount speeds up rebuilds and
+# the bind mounts keep the lockfile/manifest out of the image; this layer is rebuilt
+# only when uv.lock or pyproject.toml change - not when the source code does.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-dev
 
-# Install uv package manager.
-RUN pip install --upgrade pip && \
-    pip install uv~=${UV_VERSION}
-
-# Copy python config files and install dependencies.
-COPY pyproject.toml ./
-COPY uv.lock ./
-RUN uv export --no-hashes --no-dev | \
-    pip install --requirement /dev/stdin --no-dependencies
-
-# Copy the source code of the Actor.
+# Copy the Actor configuration and source last, so edits here reuse the cached deps layer.
 COPY .actor ./.actor
-COPY ${ACTOR_DIR}/ ./${ACTOR_DIR}/
+COPY actor_beautifulsoup_scraper/ ./actor_beautifulsoup_scraper/
 
-# Use compileall to ensure the runnability of the Actor Python code.
-RUN uv run python -m compileall -q ${ACTOR_DIR}
+# Compile the sources up front so a syntax error fails the build, not the run.
+RUN python -m compileall -q actor_beautifulsoup_scraper
 
-# Specify how to launch the source code of your Actor.
-CMD ["sh", "-c", "uv run python -m ${ACTOR_DIR}"]
+# Run the Actor as a module.
+CMD ["python", "-m", "actor_beautifulsoup_scraper"]
