@@ -21,7 +21,8 @@ dataset.
     The Actor exits with code 1 if start URLs, page function, or a proxy
     configuration are missing.
   - `utils.py` — `execute_user_function()` and `USER_DEFINED_FUNCTION_NAME`.
-- `.actor/` — Apify manifest (`actor.json`), `input_schema.json`, `Dockerfile`.
+- `.actor/` — Apify manifest (`actor.json`), `input_schema.json`,
+  `output_schema.json`, `Dockerfile`.
 
 ## Commands
 
