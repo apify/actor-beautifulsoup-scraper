@@ -2,13 +2,13 @@
 .git
 .github
 
-# Python bytecode and tool caches.
+# Python bytecode.
 __pycache__/
 *.py[cod]
 *$py.class
 .Python
-.pytest_cache/
-.mypy_cache/
+
+# Tool caches - we use ruff (lint/format) and ty (type-check).
 .ruff_cache/
 .ty_cache/
 
