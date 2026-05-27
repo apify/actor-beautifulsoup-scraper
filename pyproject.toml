@@ -63,7 +63,6 @@ include = ["actor_beautifulsoup_scraper"]
 unresolved-import = "ignore"
 
 [tool.poe.tasks]
-clean = "rm -rf .ty_cache .pytest_cache .ruff_cache build dist htmlcov .coverage"
 install-dev = "uv sync --all-extras"
 type-check = "uv run ty check"
 check-code = ["lint", "type-check"]
@@ -73,3 +72,10 @@ shell = "uv run ruff format --check && uv run ruff check"
 
 [tool.poe.tasks.format]
 shell = "uv run ruff check --fix && uv run ruff format"
+
+[tool.poe.tasks.clean]
+shell = """
+rm -rf .ruff_cache .ty_cache .venv
+find . -type d -name __pycache__ -prune -exec rm -rf {} +
+uv cache clean
+"""
