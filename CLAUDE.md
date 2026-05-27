@@ -49,7 +49,7 @@ proxy config can't be created. To run locally either `apify login` first (so
   Actor's purpose, not a smell; keep the `# noqa: S102` on the `exec` call.
 - ruff: line length 120, single quotes, `select = ["ALL"]` with the ignores in
   `pyproject.toml`; types via ty. Keep `uv run poe check-code` green.
-- Python 3.13 (`.python-version`, ty target, CI, Docker base all agree).
+- Python 3.14 (`.python-version`, ty target, CI, Docker base all agree).
 - The Dockerfile uses the uv-in-Docker BuildKit pattern (uv binary copied from
   `ghcr.io/astral-sh/uv:0.11`, `uv sync --locked --no-dev`); build with BuildKit.
 - Commit `uv.lock` whenever dependencies change.

@@ -26,7 +26,7 @@ def page_function(context: BeautifulSoupCrawlingContext) -> Any:
     }
 ```
 
-The code runs on Python 3.13 and may only import modules already installed in the Actor.
+The code runs on Python 3.14 and may only import modules already installed in the Actor.
 
 ## Proxy configuration
 
