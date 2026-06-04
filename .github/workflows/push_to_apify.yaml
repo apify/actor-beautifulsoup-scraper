@@ -17,6 +17,6 @@ jobs:
           node-version: 24
 
       - name: Push to Apify
-        uses: apify/push-actor-action@v1.1.1
+        uses: apify/push-actor-action@v1
         with:
           token: ${{ secrets.APIFY_TOKEN }}
