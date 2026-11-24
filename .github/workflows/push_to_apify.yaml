@@ -9,14 +9,14 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.1.0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.5.0
         with:
           node-version: 24
 
       - name: Push to Apify
-        uses: apify/push-actor-action@v1
+        uses: apify/push-actor-action@v1.1.4
         with:
           token: ${{ secrets.APIFY_TOKEN }}

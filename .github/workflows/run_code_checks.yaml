@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.1.0
       - name: Run actionlint
         uses: rhysd/actionlint@v1.7.12
 
@@ -32,18 +32,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.1.0
       - name: Check spelling with typos
         uses: crate-ci/typos@v1
 
   lint_check:
     name: Lint check
-    uses: apify/workflows/.github/workflows/python_lint_check.yaml@v0.45.0
-    with:
-      python_versions: '["3.14"]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: apify/actions/python-lint-check@v1.9.0
+        with:
+          python-version: "3.14"
 
   type_check:
     name: Type check
-    uses: apify/workflows/.github/workflows/python_type_check.yaml@v0.45.0
-    with:
-      python_versions: '["3.14"]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: apify/actions/python-type-check@v1.9.0
+        with:
+          python-version: "3.14"
